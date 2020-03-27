@@ -1,0 +1,35 @@
+type User {
+	id: ID! @id
+	username: String! @unique
+	email: String! @unique
+	password: String!
+	resetToken: String
+	resetTokenExpiry: String
+	notifications: [Notification]! @relation(link: TABLE, name: "NotificationsOfUser", onDelete: CASCADE)
+	channels: [Channel]! @relation(link: TABLE, name: "ChannelsOfUser", onDelete: CASCADE)
+} 
+
+type Notification {
+	id: ID! @id
+	type: NotificationType!	
+	recipients: [User!] @relation(name: "NotificationsOfUser")
+	content: String!
+	createdAt: DateTime! @createdAt
+}
+
+type Message {
+	id: ID! @id
+	sender: User! @relation(name: "SenderOfMessage")
+	recipient: User! @relation(name: "RecipientOfMessage")
+	channel: Channel!
+	content: String!
+	createdAt: DateTime! @createdAt
+}
+
+type Channel {
+	id: ID! @id
+	users: [User!]! @relation(name: "ChannelsOfUser")
+	messages: [Message]!
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}
