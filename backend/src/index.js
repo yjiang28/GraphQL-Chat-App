@@ -43,8 +43,12 @@ server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({ port: 4000 }, () => {
 	// Both GraphQL and the subscription websocket share the same port, but under different protocols
-	console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
 	console.log(
-		`Subscriptions ready at ws://localhost:4000${server.subscriptionsPath}`
+		`🚀 Server ready at http://localhost:4000${server.graphqlPath}`
+	);
+	console.log(
+		`🚀 Subscriptions ready at ws://localhost:4000${
+			server.subscriptionsPath
+		}`
 	);
 });

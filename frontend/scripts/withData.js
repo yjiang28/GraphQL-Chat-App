@@ -2,7 +2,6 @@ import withApollo from "next-with-apollo";
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
-import schema from "./schema";
 import { ApolloLink, Observable, split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";

@@ -21,7 +21,6 @@ const TextInputField = ({
   display_error = false,
   error_message
 }) => {
-  console.log(error_message);
   return (
     <Grid item xs={12}>
       {display_error &&

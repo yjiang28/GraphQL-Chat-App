@@ -11,10 +11,9 @@ import {
   Container,
   withStyles
 } from "@material-ui/core";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { TextInputField } from "./shared";
-import { CURRENT_USER_QUERY } from "../queries/User";
-import { SIGN_IN_MUTATION } from "../mutations/User";
+import { CURRENT_USER_QUERY } from "../gqls/queries/userQueries";
+import { SIGN_IN_MUTATION } from "../gqls/mutations/userMutations";
 
 const styles = theme => ({
   "@global": {
@@ -59,7 +58,7 @@ const SignIn = ({ classes }) => {
       password = formData.get("password");
 
     try {
-      const { data } = SignIn({
+      await SignIn({
         variables: { email, password }
       });
       Router.push("/");
@@ -81,9 +80,6 @@ const SignIn = ({ classes }) => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
         <Typography component="h1" variant="h5">
           Sign In
         </Typography>

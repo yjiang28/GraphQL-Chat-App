@@ -3,7 +3,9 @@ import jwt from "jsonwebtoken";
 import { UserInputError } from "apollo-server-express";
 import { forwardTo } from "prisma-binding";
 import pubsub from "../pubsub";
-import { NotificationTypes, MessageArrived } from "./Subscription";
+import { notificationTypes, newMessage } from "./Subscription";
+
+const { friendRequest, friendRequestAccepted } = notificationTypes;
 
 const Mutation = {
 	async signUp(parent, args, ctx, info) {
@@ -35,7 +37,7 @@ const Mutation = {
 		// create the JSW token
 		const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// set the JWT as a cookie on the response
-		ctx.res.cookie("token", token, {
+		await ctx.res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 30 // 1 month
 		});
@@ -58,16 +60,122 @@ const Mutation = {
 		// create the JSW token
 		const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// set the JWT as a cookie on the response
-		ctx.res.cookie("token", token, {
+		await ctx.res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 30 // 1 month
 		});
 
 		return user;
 	},
-	signOut(parent, args, ctx, info) {
-		ctx.res.clearCookie("token");
+	async signOut(parent, args, ctx, info) {
+		await ctx.res.clearCookie("token");
 		return { message: "Successfully signed out!" };
+	},
+	async sendFriendRequest(parent, args, ctx, info) {
+		if (!ctx.req.userId) {
+			console.log("addFriend mutation: userId is required.");
+			return null;
+		}
+
+		const { username: recipientUsername } = args;
+		const { userId } = ctx.req;
+		const { username: senderUsername } = await ctx.db.query.user(
+			{ where: { id: userId } },
+			"{username}"
+		);
+
+		const notification = await ctx.db.mutation.createNotification(
+			{
+				data: {
+					sender: {
+						connect: { username: senderUsername }
+					},
+					recipient: {
+						connect: { username: recipientUsername }
+					},
+					type: friendRequest,
+					content: `User ${senderUsername} sent you a friend request!`
+				}
+			},
+			`{id type content recipient{id} createdAt}`
+		);
+
+		pubsub.publish(friendRequest, {
+			notification
+		});
+
+		return notification;
+	},
+	async acceptFriendRequest(parent, args, ctx, info) {
+		if (!ctx.req.userId) {
+			console.log("acceptFriendRequest mutation: userId is required.");
+			return null;
+		}
+
+		const { id } = args;
+
+		const { sender, recipient } = await ctx.db.query.notification(
+			{ where: { id } },
+			"{sender{ id username } recipient{ id username}}"
+		);
+
+		const notificationToRecipient = await ctx.db.mutation.createNotification(
+			{
+				data: {
+					sender: {
+						connect: { id: sender.id }
+					},
+					recipient: {
+						connect: { id: recipient.id }
+					},
+					type: friendRequestAccepted,
+					content: `You became friends with ${sender.username}.`
+				}
+			},
+			"{id type content sender{id username} recipient{id username}}"
+		);
+
+		const notificationToSender = await ctx.db.mutation.createNotification(
+			{
+				data: {
+					sender: {
+						connect: { id: recipient.id }
+					},
+					recipient: {
+						connect: { id: sender.id }
+					},
+					type: friendRequestAccepted,
+					content: `You became friends with ${recipient.username}.`
+				}
+			},
+			"{id type content sender{id username} recipient{id username}}"
+		);
+
+		await ctx.db.mutation.deleteNotification({
+			where: { id }
+		});
+
+		pubsub.publish(friendRequestAccepted, {
+			notification: notificationToRecipient
+		});
+
+		pubsub.publish(friendRequestAccepted, {
+			notification: notificationToSender
+		});
+
+		const channel = await ctx.db.mutation.createChannel(
+			{
+				data: {
+					users: {
+						connect: [{ id: recipient.id }, { id: sender.id }]
+					},
+					messages: []
+				}
+			},
+			"{id users{id username}}"
+		);
+
+		return channel;
 	},
 	async sendMessage(parent, args, ctx, info) {
 		if (!ctx.req.userId) {

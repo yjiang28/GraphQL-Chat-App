@@ -11,13 +11,15 @@ const useStyles = makeStyles(theme => ({
 			width: "100vw",
 			height: "100vh",
 			margin: 0
+		},
+		"*": {
+			boxSizing: "border-box"
 		}
 	}
 }));
 
 const App = ({ me, pathname, query }) => {
 	useStyles();
-
 	return (
 		<Fragment>
 			<NavBar me={me} />

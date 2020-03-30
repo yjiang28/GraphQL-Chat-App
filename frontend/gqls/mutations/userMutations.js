@@ -19,7 +19,7 @@ const SIGN_IN_MUTATION = gql`
 	}
 `;
 
-const SIGNOUT_MUTATION = gql`
+const SIGN_OUT_MUTATION = gql`
 	mutation SignOut {
 		signOut {
 			message
@@ -27,4 +27,4 @@ const SIGNOUT_MUTATION = gql`
 	}
 `;
 
-export { SIGN_UP_MUTATION, SIGN_IN_MUTATION, SIGNOUT_MUTATION };
+export { SIGN_UP_MUTATION, SIGN_IN_MUTATION, SIGN_OUT_MUTATION };

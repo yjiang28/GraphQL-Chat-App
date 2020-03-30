@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import KeyboardIcon from "@material-ui/icons/Keyboard";
 import SendIcon from "@material-ui/icons/Send";
-import { SEND_MESSAGE_MUTATION } from "../../mutations/channel";
+import { SEND_MESSAGE_MUTATION } from "../../gqls/mutations/channelMutations";
 
 const styles = theme => ({
   appBar: {
@@ -19,7 +19,7 @@ const styles = theme => ({
   },
   message: {
     position: "relative",
-    borderRadius: 4 * theme.shape.borderRadius,
+    borderRadius: theme.shape.borderRadius * 3,
     backgroundColor: theme.palette.grey[200],
     marginLeft: 0,
     width: "100%",
@@ -39,7 +39,7 @@ const styles = theme => ({
   }
 });
 
-const MessageBar = ({ classes, channelId }) => {
+const MessageInputField = ({ classes, channelId }) => {
   const [SendMessage, _] = useMutation(SEND_MESSAGE_MUTATION);
 
   const sendMessage = async e => {
@@ -52,7 +52,7 @@ const MessageBar = ({ classes, channelId }) => {
         variables: { channelId, message }
       });
     } catch (e) {
-      console.log(e);
+      console.log("MessageForm", e);
     }
   };
 
@@ -86,4 +86,4 @@ const MessageBar = ({ classes, channelId }) => {
   );
 };
 
-export default withStyles(styles)(MessageBar);
+export default withStyles(styles)(MessageInputField);

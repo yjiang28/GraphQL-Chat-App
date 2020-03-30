@@ -1,39 +1,55 @@
-import { useState } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
 import {
-	MenuItem,
-	Button,
-	Grid,
+	Avatar,
+	ListItem,
+	ListItemAvatar,
+	ListItemText,
+	ListItemSecondaryAction,
+	IconButton,
 	Typography,
 	withStyles
 } from "@material-ui/core";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import { SEND_FRIEND_REQUEST_MUTATION } from "../../gqls/mutations/notificationMutations";
+import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
+const styles = theme => ({});
 
-const styles = theme => ({
-	button: {
-		marginRight: theme.spacing(0)
-	}
+const SearchResult = forwardRef(({ classes, username }, ref) => {
+	const [SendFriendRequest, _] = useMutation(SEND_FRIEND_REQUEST_MUTATION, {
+		refetchQueries: [
+			{
+				query: NOTIFICATIONS_QUERY
+			}
+		]
+	});
+
+	const sendFriendRequest = async () => {
+		const data = await SendFriendRequest({ variables: { username } });
+	};
+
+	return (
+		<ListItem>
+			<ListItemAvatar>
+				<Avatar alt={username} src="/static/images/avatar/1.jpg" />
+			</ListItemAvatar>
+			<ListItemText primary={username} />
+			<ListItemSecondaryAction>
+				<IconButton
+					edge="end"
+					aria-label="add"
+					onClick={sendFriendRequest}
+				>
+					<AddBoxIcon />
+				</IconButton>
+			</ListItemSecondaryAction>
+		</ListItem>
+	);
 });
 
-const SearchResult = ({ classes, email }) => {
-	return (
-		<MenuItem key={notification}>
-			<Grid container justify="space-between" alignItems="center">
-				<Grid item>
-					<Typography>{email}</Typography>
-				</Grid>
-				<Grid item>
-					<Button color="primary" variant="outlined">
-						Add Friend
-					</Button>
-				</Grid>
-			</Grid>
-		</MenuItem>
-	);
-};
-
 SearchResult.propTypes = {
-	email: PropTypes.string.isRequired
+	username: PropTypes.string.isRequired
 };
 
 export default withStyles(styles)(SearchResult);

@@ -10,9 +10,10 @@ type User {
 } 
 
 type Notification {
-	id: ID! @id
-	type: NotificationType!	
-	recipients: [User!] @relation(name: "NotificationsOfUser")
+	id: ID! @id	
+	type: NotificationType
+	sender: User! @relation(name: "SenderOfNotification")
+	recipient: User! @relation(name: "NotificationsOfUser")
 	content: String!
 	createdAt: DateTime! @createdAt
 }

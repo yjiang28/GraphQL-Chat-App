@@ -2,8 +2,8 @@ import { forwardTo } from "prisma-binding";
 import pubsub from "../pubsub";
 
 const Query = {
-	users: forwardTo("db"),
 	user: forwardTo("db"),
+	users: forwardTo("db"),
 	channel: forwardTo("db"),
 	channels: forwardTo("db"),
 	async me(parent, args, ctx, info) {

@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/lillyj970920/chat-app/dev
-# timestamp: Fri Mar 27 2020 21:53:51 GMT+0800 (China Standard Time)
+# timestamp: Tue Mar 31 2020 00:42:55 GMT+0800 (China Standard Time)
 
 type AggregateChannel {
   count: Int!
@@ -808,8 +808,9 @@ interface Node {
 
 type Notification implements Node {
   id: ID!
-  type: NotificationType!
-  recipients(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  type: NotificationType
+  sender: User!
+  recipient: User!
   content: String!
   createdAt: DateTime!
 }
@@ -826,20 +827,22 @@ type NotificationConnection {
 
 input NotificationCreateInput {
   id: ID
-  type: NotificationType!
+  type: NotificationType
   content: String!
-  recipients: UserCreateManyWithoutNotificationsInput
+  sender: UserCreateOneInput!
+  recipient: UserCreateOneWithoutNotificationsInput!
 }
 
-input NotificationCreateManyWithoutRecipientsInput {
-  create: [NotificationCreateWithoutRecipientsInput!]
+input NotificationCreateManyWithoutRecipientInput {
+  create: [NotificationCreateWithoutRecipientInput!]
   connect: [NotificationWhereUniqueInput!]
 }
 
-input NotificationCreateWithoutRecipientsInput {
+input NotificationCreateWithoutRecipientInput {
   id: ID
-  type: NotificationType!
+  type: NotificationType
   content: String!
+  sender: UserCreateOneInput!
 }
 
 """An edge in a connection."""
@@ -864,7 +867,7 @@ enum NotificationOrderByInput {
 
 type NotificationPreviousValues {
   id: ID!
-  type: NotificationType!
+  type: NotificationType
   content: String!
   createdAt: DateTime!
 }
@@ -1039,7 +1042,8 @@ enum NotificationType {
 input NotificationUpdateInput {
   type: NotificationType
   content: String
-  recipients: UserUpdateManyWithoutNotificationsInput
+  sender: UserUpdateOneRequiredInput
+  recipient: UserUpdateOneRequiredWithoutNotificationsInput
 }
 
 input NotificationUpdateManyDataInput {
@@ -1052,16 +1056,16 @@ input NotificationUpdateManyMutationInput {
   content: String
 }
 
-input NotificationUpdateManyWithoutRecipientsInput {
-  create: [NotificationCreateWithoutRecipientsInput!]
+input NotificationUpdateManyWithoutRecipientInput {
+  create: [NotificationCreateWithoutRecipientInput!]
   connect: [NotificationWhereUniqueInput!]
   set: [NotificationWhereUniqueInput!]
   disconnect: [NotificationWhereUniqueInput!]
   delete: [NotificationWhereUniqueInput!]
-  update: [NotificationUpdateWithWhereUniqueWithoutRecipientsInput!]
+  update: [NotificationUpdateWithWhereUniqueWithoutRecipientInput!]
   updateMany: [NotificationUpdateManyWithWhereNestedInput!]
   deleteMany: [NotificationScalarWhereInput!]
-  upsert: [NotificationUpsertWithWhereUniqueWithoutRecipientsInput!]
+  upsert: [NotificationUpsertWithWhereUniqueWithoutRecipientInput!]
 }
 
 input NotificationUpdateManyWithWhereNestedInput {
@@ -1069,20 +1073,21 @@ input NotificationUpdateManyWithWhereNestedInput {
   data: NotificationUpdateManyDataInput!
 }
 
-input NotificationUpdateWithoutRecipientsDataInput {
+input NotificationUpdateWithoutRecipientDataInput {
   type: NotificationType
   content: String
+  sender: UserUpdateOneRequiredInput
 }
 
-input NotificationUpdateWithWhereUniqueWithoutRecipientsInput {
+input NotificationUpdateWithWhereUniqueWithoutRecipientInput {
   where: NotificationWhereUniqueInput!
-  data: NotificationUpdateWithoutRecipientsDataInput!
+  data: NotificationUpdateWithoutRecipientDataInput!
 }
 
-input NotificationUpsertWithWhereUniqueWithoutRecipientsInput {
+input NotificationUpsertWithWhereUniqueWithoutRecipientInput {
   where: NotificationWhereUniqueInput!
-  update: NotificationUpdateWithoutRecipientsDataInput!
-  create: NotificationCreateWithoutRecipientsInput!
+  update: NotificationUpdateWithoutRecipientDataInput!
+  create: NotificationCreateWithoutRecipientInput!
 }
 
 input NotificationWhereInput {
@@ -1206,9 +1211,8 @@ input NotificationWhereInput {
 
   """All values greater than or equal the given value."""
   createdAt_gte: DateTime
-  recipients_every: UserWhereInput
-  recipients_some: UserWhereInput
-  recipients_none: UserWhereInput
+  sender: UserWhereInput
+  recipient: UserWhereInput
 }
 
 input NotificationWhereUniqueInput {
@@ -1286,7 +1290,7 @@ input UserCreateInput {
   password: String!
   resetToken: String
   resetTokenExpiry: String
-  notifications: NotificationCreateManyWithoutRecipientsInput
+  notifications: NotificationCreateManyWithoutRecipientInput
   channels: ChannelCreateManyWithoutUsersInput
 }
 
@@ -1295,13 +1299,13 @@ input UserCreateManyWithoutChannelsInput {
   connect: [UserWhereUniqueInput!]
 }
 
-input UserCreateManyWithoutNotificationsInput {
-  create: [UserCreateWithoutNotificationsInput!]
-  connect: [UserWhereUniqueInput!]
-}
-
 input UserCreateOneInput {
   create: UserCreateInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutNotificationsInput {
+  create: UserCreateWithoutNotificationsInput
   connect: UserWhereUniqueInput
 }
 
@@ -1312,7 +1316,7 @@ input UserCreateWithoutChannelsInput {
   password: String!
   resetToken: String
   resetTokenExpiry: String
-  notifications: NotificationCreateManyWithoutRecipientsInput
+  notifications: NotificationCreateManyWithoutRecipientInput
 }
 
 input UserCreateWithoutNotificationsInput {
@@ -1654,7 +1658,7 @@ input UserUpdateDataInput {
   password: String
   resetToken: String
   resetTokenExpiry: String
-  notifications: NotificationUpdateManyWithoutRecipientsInput
+  notifications: NotificationUpdateManyWithoutRecipientInput
   channels: ChannelUpdateManyWithoutUsersInput
 }
 
@@ -1664,7 +1668,7 @@ input UserUpdateInput {
   password: String
   resetToken: String
   resetTokenExpiry: String
-  notifications: NotificationUpdateManyWithoutRecipientsInput
+  notifications: NotificationUpdateManyWithoutRecipientInput
   channels: ChannelUpdateManyWithoutUsersInput
 }
 
@@ -1696,18 +1700,6 @@ input UserUpdateManyWithoutChannelsInput {
   upsert: [UserUpsertWithWhereUniqueWithoutChannelsInput!]
 }
 
-input UserUpdateManyWithoutNotificationsInput {
-  create: [UserCreateWithoutNotificationsInput!]
-  connect: [UserWhereUniqueInput!]
-  set: [UserWhereUniqueInput!]
-  disconnect: [UserWhereUniqueInput!]
-  delete: [UserWhereUniqueInput!]
-  update: [UserUpdateWithWhereUniqueWithoutNotificationsInput!]
-  updateMany: [UserUpdateManyWithWhereNestedInput!]
-  deleteMany: [UserScalarWhereInput!]
-  upsert: [UserUpsertWithWhereUniqueWithoutNotificationsInput!]
-}
-
 input UserUpdateManyWithWhereNestedInput {
   where: UserScalarWhereInput!
   data: UserUpdateManyDataInput!
@@ -1720,13 +1712,20 @@ input UserUpdateOneRequiredInput {
   upsert: UserUpsertNestedInput
 }
 
+input UserUpdateOneRequiredWithoutNotificationsInput {
+  create: UserCreateWithoutNotificationsInput
+  connect: UserWhereUniqueInput
+  update: UserUpdateWithoutNotificationsDataInput
+  upsert: UserUpsertWithoutNotificationsInput
+}
+
 input UserUpdateWithoutChannelsDataInput {
   username: String
   email: String
   password: String
   resetToken: String
   resetTokenExpiry: String
-  notifications: NotificationUpdateManyWithoutRecipientsInput
+  notifications: NotificationUpdateManyWithoutRecipientInput
 }
 
 input UserUpdateWithoutNotificationsDataInput {
@@ -1743,26 +1742,20 @@ input UserUpdateWithWhereUniqueWithoutChannelsInput {
   data: UserUpdateWithoutChannelsDataInput!
 }
 
-input UserUpdateWithWhereUniqueWithoutNotificationsInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateWithoutNotificationsDataInput!
-}
-
 input UserUpsertNestedInput {
   update: UserUpdateDataInput!
   create: UserCreateInput!
+}
+
+input UserUpsertWithoutNotificationsInput {
+  update: UserUpdateWithoutNotificationsDataInput!
+  create: UserCreateWithoutNotificationsInput!
 }
 
 input UserUpsertWithWhereUniqueWithoutChannelsInput {
   where: UserWhereUniqueInput!
   update: UserUpdateWithoutChannelsDataInput!
   create: UserCreateWithoutChannelsInput!
-}
-
-input UserUpsertWithWhereUniqueWithoutNotificationsInput {
-  where: UserWhereUniqueInput!
-  update: UserUpdateWithoutNotificationsDataInput!
-  create: UserCreateWithoutNotificationsInput!
 }
 
 input UserWhereInput {
