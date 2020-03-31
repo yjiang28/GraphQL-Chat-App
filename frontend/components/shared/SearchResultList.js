@@ -8,7 +8,7 @@ import { USER_QUERY, SEARCH_USER_QUERY } from "../../gqls/queries/userQueries";
 const styles = theme => ({
 	root: {
 		position: "absolute",
-		top: theme.spacing(9),
+		top: theme.spacing(17),
 		bottom: 0,
 		left: 0,
 		right: 0,

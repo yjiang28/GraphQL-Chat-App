@@ -16,6 +16,18 @@ const CHANNEL_QUERY = gql`
 	}
 `;
 
+const ACTIVE_CHANNEL_QUERY = gql`
+	{
+		activeChannel @client {
+			id
+			users {
+				id
+				username
+			}
+		}
+	}
+`;
+
 const CHANNEL_MESSAGES_QUERY = gql`
 	query ChannelMessages($channelId: ID!) {
 		channelMessages(channelId: $channelId) {
@@ -42,4 +54,9 @@ const LATEST_ACTIVE_CHANNEL_QUERY = gql`
 	}
 `;
 
-export { CHANNEL_QUERY, CHANNEL_MESSAGES_QUERY, LATEST_ACTIVE_CHANNEL_QUERY };
+export {
+	CHANNEL_QUERY,
+	ACTIVE_CHANNEL_QUERY,
+	CHANNEL_MESSAGES_QUERY,
+	LATEST_ACTIVE_CHANNEL_QUERY
+};

@@ -97,6 +97,7 @@ function createClient({ headers }) {
 	return new ApolloClient({
 		link: ApolloLink.from([requestLink, link]),
 		cache,
+		resolvers: {},
 		ssrMode: typeof window === "undefined" // Disables forceFetch on the server (so queries are only run once)
 	});
 }

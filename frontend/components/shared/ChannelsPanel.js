@@ -8,7 +8,7 @@ import {
 	ListItem,
 	withStyles
 } from "@material-ui/core";
-import { Channel, SearchForm } from "./";
+import { Channel, ChannelBanner, SearchForm } from "./";
 import { CHANNEL_QUERY } from "../../gqls/queries/channelQueries";
 
 const styles = theme => ({
@@ -18,7 +18,7 @@ const styles = theme => ({
 		maxHeight: "100%",
 		overflowY: "auto",
 		overflowX: "hidden",
-		padding: theme.spacing(1, 2)
+		padding: theme.spacing(0, 2)
 	},
 	list: {
 		width: "100%",
@@ -63,6 +63,7 @@ const ChannelPanel = ({ classes, me, channelId }) => {
 
 	return (
 		<Paper classes={{ root: classes.paper }} square>
+			<ChannelBanner me={me} />
 			<SearchForm />
 			<List classes={{ root: classes.list }}>{channelItems()}</List>
 		</Paper>

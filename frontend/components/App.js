@@ -1,6 +1,11 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/core/styles";
+import { useApolloClient } from "@apollo/react-hooks";
+import {
+	makeStyles,
+	ThemeProvider,
+	createMuiTheme
+} from "@material-ui/core/styles";
 import NavBar from "./NavBar";
 import ChatRoom from "./ChatRoom";
 import SignIn from "./SignIn";
@@ -19,19 +24,37 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
+const theme = createMuiTheme({
+	navHeight: 64,
+	palette: {
+		primary: {
+			main: "#222"
+		}
+	},
+	typography: {
+		fontFamily: '"Lato", "Roboto", "Helvetica", "Arial", sans-serif'
+	}
+});
+
 const App = ({ me, pathname, query }) => {
 	useStyles();
+	const client = useApolloClient();
+
+	useEffect(() => {
+		client.writeData({ data: { me } });
+	}, [me]);
+
 	return (
-		<Fragment>
-			<NavBar me={me} />
-			{me ? (
+		<ThemeProvider theme={theme}>
+			{me && <NavBar me={me} />}
+			{me && pathname && query ? (
 				<ChatRoom me={me} query={query} />
 			) : pathname == "/signup" ? (
 				<SignUp />
 			) : (
 				<SignIn />
 			)}
-		</Fragment>
+		</ThemeProvider>
 	);
 };
 

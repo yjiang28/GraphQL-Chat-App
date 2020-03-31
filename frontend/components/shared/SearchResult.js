@@ -15,7 +15,12 @@ import AddBoxIcon from "@material-ui/icons/AddBox";
 import { SEND_FRIEND_REQUEST_MUTATION } from "../../gqls/mutations/notificationMutations";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
 
-const styles = theme => ({});
+const styles = theme => ({
+	small: {
+		width: theme.spacing(4),
+		height: theme.spacing(4)
+	}
+});
 
 const SearchResult = forwardRef(({ classes, username }, ref) => {
 	const [SendFriendRequest, _] = useMutation(SEND_FRIEND_REQUEST_MUTATION, {
@@ -33,7 +38,7 @@ const SearchResult = forwardRef(({ classes, username }, ref) => {
 	return (
 		<ListItem button>
 			<ListItemAvatar>
-				<Avatar alt={username} src="" />
+				<Avatar alt={username} src="" className={classes.small} />
 			</ListItemAvatar>
 			<ListItemText primary={username} />
 			<ListItemSecondaryAction>

@@ -17,7 +17,7 @@ const styles = theme => ({
     margin: 0
   },
   toolBar: {
-    padding: theme.spacing(1, 6)
+    padding: theme.spacing(1, 4)
   },
   message: {
     position: "relative",
@@ -33,7 +33,7 @@ const styles = theme => ({
     padding: theme.spacing(1, 2),
     borderRadius: theme.shape.borderRadius,
     color: "inherit",
-    backgroundColor: theme.palette.grey[200]
+    backgroundColor: theme.palette.grey[300]
   },
   inputInput: {
     transition: theme.transitions.create("width"),
@@ -61,7 +61,7 @@ const MessageForm = ({ classes, channelId }) => {
   return (
     <AppBar
       position="relative"
-      color="inherit"
+      color="default"
       classes={{ root: classes.appBar }}
     >
       <form onSubmit={sendMessage}>

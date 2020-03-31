@@ -1,31 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQuery, useSubscription } from "@apollo/react-hooks";
 import { Paper, Grid, Typography, List, withStyles } from "@material-ui/core";
-import { Message, MessageForm } from "./";
+import { Message, MessageBanner, MessageForm } from "./";
 import { CHANNEL_MESSAGES_QUERY } from "../../gqls/queries/channelQueries";
 import { MESSAGE_SUBSCRIPTION } from "../../gqls/subscriptions/channelSubscriptions";
 
 const styles = theme => ({
 	container: {
+		position: "relative",
 		height: "100%",
-		maxHeight: `calc(100vh - ${theme.spacing(8)}px)`,
-		overflowY: "auto",
-		overflowX: "hidden"
+		maxHeight: `calc(100vh - ${theme.navHeight}px)`,
+		overflow: "hidden"
 	},
 	messagesPaper: {
-		padding: theme.spacing(4),
-		height: `calc(100% - ${theme.spacing(8)}px)`,
-		maxHeight: `calc(100% - ${theme.spacing(8)}px)`,
+		padding: theme.spacing(2),
+		height: `calc(100% - 2 * ${theme.navHeight}px)`,
+		maxHeight: `calc(100% - 2 * ${theme.navHeight}px)`,
 		overflowY: "auto",
 		overflowX: "hidden"
 	}
 });
 
+const scrollToBottom = messagesEndRef => {
+	messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+};
+
 const MessagesPanel = ({ classes, me, channelId }) => {
 	const { data, loading, refetch } = useQuery(CHANNEL_MESSAGES_QUERY, {
 		variables: { channelId }
 	});
+	const messagesEndRef = useRef();
 
 	const { error } = useSubscription(MESSAGE_SUBSCRIPTION, {
 		variables: { userId: me.id },
@@ -43,6 +48,10 @@ const MessagesPanel = ({ classes, me, channelId }) => {
 		if (channelId && refetch) refetch();
 	}, [channelId]);
 
+	useEffect(() => {
+		scrollToBottom(messagesEndRef);
+	}, [data]);
+
 	const messgageItems = () => {
 		if (loading) return <div>Loading...</div>;
 		if (data && data.channelMessages) {
@@ -56,9 +65,15 @@ const MessagesPanel = ({ classes, me, channelId }) => {
 
 	return (
 		<Paper classes={{ root: classes.container }} square>
-			<Paper classes={{ root: classes.messagesPaper }} square>
+			<MessageBanner me={me} />
+			<Paper
+				classes={{ root: classes.messagesPaper }}
+				square
+				elevation={0}
+			>
 				<Grid container direction="column" spacing={2}>
 					{messgageItems()}
+					<Grid item ref={messagesEndRef} />
 				</Grid>
 			</Paper>
 			<MessageForm channelId={channelId} />

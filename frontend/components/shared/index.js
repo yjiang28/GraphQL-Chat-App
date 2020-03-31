@@ -1,10 +1,13 @@
 export { default as Channel } from "./Channel";
+export { default as ChannelBanner } from "./ChannelBanner";
 export { default as ChannelsPanel } from "./ChannelsPanel";
 export { default as Message } from "./Message";
+export { default as MessageBanner } from "./MessageBanner";
 export { default as MessageForm } from "./MessageForm";
 export { default as MessagesPanel } from "./MessagesPanel";
 export { default as Notification } from "./Notification";
 export { default as NotificationButton } from "./NotificationButton";
+export { default as ProfileButton } from "./ProfileButton";
 export { default as SearchResult } from "./SearchResult";
 export { default as SearchResultList } from "./SearchResultList";
 export { default as SearchForm } from "./SearchForm";

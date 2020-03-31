@@ -21,8 +21,7 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: theme.spacing(1, 0),
-    height: theme.spacing(5)
+    padding: theme.spacing(1, 0)
   },
   search: {
     position: "relative",
