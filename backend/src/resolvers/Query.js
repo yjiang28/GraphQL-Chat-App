@@ -25,14 +25,24 @@ const Query = {
 
 		return users ? users : [];
 	},
+	async channels(parent, args, ctx, info) {
+		if (!ctx.req.userId) return null;
+		const { userId } = ctx.req;
+		return await ctx.db.query.channels(
+			{
+				where: { users_some: { id: userId } },
+				orderBy: "updatedAt_DESC"
+			},
+			"{id users{id username}}"
+		);
+	},
 	async latestActiveChannel(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
 		const { userId } = ctx.req;
-
 		const channels = await ctx.db.query.channels(
 			{
 				where: { users_some: { id: userId } },
-				orderBy: "createdAt_ASC",
+				orderBy: "updatedAt_ASC",
 				first: 1
 			},
 			info

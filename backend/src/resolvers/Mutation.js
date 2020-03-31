@@ -123,7 +123,7 @@ const Mutation = {
 		}
 
 		const { id } = args;
-		console.log("hh");
+
 		const { sender, recipient } = await ctx.db.query.notification(
 			{ where: { id } },
 			"{sender{ id username } recipient{ id username}}"

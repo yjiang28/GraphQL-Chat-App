@@ -3,6 +3,7 @@ type User {
 	username: String! @unique
 	email: String! @unique
 	password: String!
+	avatar: String
 	resetToken: String
 	resetTokenExpiry: String
 	notifications: [Notification]! @relation(link: TABLE, name: "NotificationsOfUser", onDelete: CASCADE)
