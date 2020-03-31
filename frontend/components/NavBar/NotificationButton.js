@@ -5,17 +5,24 @@ import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import Notification from "./Notification";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
+import { CHANNEL_QUERY } from "../../gqls/queries/channelQueries";
 import { NOTIFICATION_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
 
 const NotificationButton = ({ me }) => {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [newNotif, setNewNotif] = useState(false);
 	const { data, loading, refetch } = useQuery(NOTIFICATIONS_QUERY);
+	const { refetch: refetchChannels } = useQuery(CHANNEL_QUERY);
 
 	useSubscription(NOTIFICATION_SUBSCRIPTION, {
 		variables: { userId: me.id },
 		onSubscriptionData: ({ subscriptionData }) => {
 			if (refetch) refetch();
+			if (
+				subscriptionData.data.notification.type ===
+				"FriendRequestAccepted"
+			)
+				refetchChannels();
 		}
 	});
 

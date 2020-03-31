@@ -14,7 +14,10 @@ const ACCEPT_FRIEND_REQUEST_MUTATION = gql`
 	mutation AcceptFriendRequest($id: ID!) {
 		acceptFriendRequest(id: $id) {
 			id
-			content
+			users {
+				id
+				username
+			}
 		}
 	}
 `;

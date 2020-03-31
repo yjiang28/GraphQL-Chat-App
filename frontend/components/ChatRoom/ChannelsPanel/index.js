@@ -33,8 +33,8 @@ const ChannelPanel = ({ classes, me, channelId }) => {
 
 	const channelItems = () => {
 		if (loading) return <ListItem>Loading...</ListItem>;
-		if (data && data.me) {
-			const { channels } = data.me;
+		if (data && data.channels) {
+			const { channels } = data;
 
 			if (!channels || channels.length == 0)
 				return (

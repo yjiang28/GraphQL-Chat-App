@@ -7,6 +7,7 @@ import {
 	Typography,
 	withStyles
 } from "@material-ui/core";
+import { processUsername } from "../../../scripts/utils";
 
 const styles = theme => ({
 	container: {
@@ -19,6 +20,8 @@ const styles = theme => ({
 });
 
 const ChannelBanner = ({ classes, me }) => {
+	const username = processUsername(me.username);
+
 	return (
 		<Paper classes={{ root: classes.container }} elevation={0} square>
 			<Grid
@@ -29,11 +32,11 @@ const ChannelBanner = ({ classes, me }) => {
 			>
 				<Grid item>
 					<IconButton>
-						<Avatar alt={me.username} src="" />
+						<Avatar alt={username} src="" />
 					</IconButton>
 				</Grid>
 				<Grid item>
-					<Typography>{me.username}</Typography>
+					<Typography>{username}</Typography>
 				</Grid>
 			</Grid>
 		</Paper>

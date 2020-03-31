@@ -3,14 +3,11 @@ import gql from "graphql-tag";
 
 const CHANNEL_QUERY = gql`
 	{
-		me {
+		channels {
 			id
-			channels {
+			users {
 				id
-				users {
-					id
-					username
-				}
+				username
 			}
 		}
 	}

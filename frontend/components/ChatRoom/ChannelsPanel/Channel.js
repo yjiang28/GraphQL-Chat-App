@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import PropTypes from "prop-types";
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery, useApolloClient } from "@apollo/react-hooks";
 import Router from "next/router";
 import {
 	ListItem,
@@ -15,6 +15,7 @@ import {
 	withStyles
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import { processUsername } from "../../../scripts/utils";
 
 const styles = theme => ({
 	listItem: {
@@ -22,10 +23,14 @@ const styles = theme => ({
 	},
 	inline: {
 		display: "inline"
+	},
+	username: {
+		textTransform: "none"
 	}
 });
 
 const Channel = ({ classes, me, user, channel, active }) => {
+	const client = useApolloClient();
 	const { username } = user;
 	const { id: channelId } = channel;
 
@@ -36,6 +41,7 @@ const Channel = ({ classes, me, user, channel, active }) => {
 			pathname: "/chatroom",
 			query: { channelId }
 		});
+		client.writeData({ data: { activeChannel: channel } });
 	};
 
 	const deleteContact = () => {};
@@ -44,17 +50,29 @@ const Channel = ({ classes, me, user, channel, active }) => {
 		<Fragment>
 			<ListItem
 				component={Button}
-				alignItems="flex-start"
+				alignItems="center"
 				classes={{ root: classes.listItem }}
 				onClick={handleClick}
 				selected={active}
 			>
 				<ListItemAvatar>
-					<Avatar alt={username} src="/static/images/avatar/1.jpg" />
+					<Avatar
+						alt={
+							username == me.username
+								? "Just You"
+								: processUsername(username)
+						}
+						src="/static/images/avatar/1.jpg"
+					/>
 				</ListItemAvatar>
 				<ListItemText
-					primary={username == me.username ? "Just You" : username}
-					secondary={"Let's chat!"}
+					primary={
+						username == me.username
+							? "Just You"
+							: processUsername(username)
+					}
+					classes={{ root: classes.username }}
+					disableTypography
 				/>
 				<ListItemSecondaryAction>
 					<IconButton

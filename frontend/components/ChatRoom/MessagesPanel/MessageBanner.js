@@ -13,6 +13,7 @@ import {
 import Message from "./Message";
 import MessageForm from "./MessageForm";
 import { ACTIVE_CHANNEL_QUERY } from "../../../gqls/queries/channelQueries";
+import { processUsername } from "../../../scripts/utils";
 
 const styles = theme => ({
 	container: {
@@ -34,12 +35,14 @@ const MessageBanner = ({ classes, me }) => {
 	useEffect(() => {
 		if (data && data.activeChannel) {
 			const { users } = data.activeChannel;
-			if (users.length == 1) setRecipient(me.username);
+			if (users.length == 1) setRecipient(processUsername(me.username));
 			else {
 				setRecipient(
-					users[0].username === me.username
-						? users[1].username
-						: users[0].username
+					processUsername(
+						users[0].username === me.username
+							? users[1].username
+							: users[0].username
+					)
 				);
 			}
 		}

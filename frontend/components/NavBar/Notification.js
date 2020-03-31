@@ -41,16 +41,16 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 		}
 	);
 
-	const acceptFriendRequest = async () => {
+	const acceptFriendRequest = () => {
 		try {
-			await AcceptFriendRequest({ variables: { id } });
+			AcceptFriendRequest({ variables: { id } });
 		} catch (e) {
 			console.log(e);
 		}
 	};
 
 	return (
-		<MenuItem key={notification}>
+		<MenuItem>
 			<Grid container justify="space-between" alignItems="center">
 				<Grid item>
 					<Typography>{content}</Typography>
