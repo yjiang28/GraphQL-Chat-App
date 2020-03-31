@@ -3,7 +3,8 @@ import App from "../components/App";
 import { CURRENT_USER_QUERY } from "../gqls/queries/userQueries";
 
 const home = props => {
-	const { data, error, loading, pathname, query } = props;
+	const { data, error, loading, pathname, query = {} } = props;
+
 	if (loading) return <div>loading</div>;
 	if (error) return <Error statusCode={404} />;
 	if (data) {

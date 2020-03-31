@@ -14,6 +14,7 @@ import {
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import { SEND_FRIEND_REQUEST_MUTATION } from "../../gqls/mutations/notificationMutations";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
+
 const styles = theme => ({});
 
 const SearchResult = forwardRef(({ classes, username }, ref) => {
@@ -30,9 +31,9 @@ const SearchResult = forwardRef(({ classes, username }, ref) => {
 	};
 
 	return (
-		<ListItem>
+		<ListItem button>
 			<ListItemAvatar>
-				<Avatar alt={username} src="/static/images/avatar/1.jpg" />
+				<Avatar alt={username} src="" />
 			</ListItemAvatar>
 			<ListItemText primary={username} />
 			<ListItemSecondaryAction>

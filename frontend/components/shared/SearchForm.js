@@ -21,44 +21,46 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: theme.spacing(1, 0, 1, 0)
+    padding: theme.spacing(1, 0),
+    height: theme.spacing(5)
   },
   search: {
     position: "relative",
     borderRadius: theme.shape.borderRadius,
     backgroundColor: theme.palette.grey[200],
-    width: `calc(100% - ${theme.spacing(6)}px)`
+    width: "100%",
+    padding: theme.spacing(0, 2),
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   inputRoot: {
+    width: "100%",
+    borderRadius: theme.shape.borderRadius,
     color: "inherit",
-    width: "100%"
+    backgroundColor: theme.palette.grey[200]
   },
   inputInput: {
-    padding: theme.spacing(2),
     transition: theme.transitions.create("width"),
     width: "100%"
   }
 });
 
 const SearchForm = ({ classes }) => {
+  const [focused, setFocused] = useState(false);
   const [username, setUsername] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [result, setResult] = useState(null);
   const ref = useRef();
 
   const handleChange = e => {
     setUsername(e.currentTarget.value);
   };
 
-  const closeMenu = () => {
-    setAnchorEl(null);
+  const handleFocus = e => {
+    setFocused(true);
   };
 
-  const submit = e => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    setUsername(formData.get("username"));
-    setAnchorEl(e.currentTarget);
+  const handleBlur = e => {
+    setFocused(false);
   };
 
   return (
@@ -66,29 +68,31 @@ const SearchForm = ({ classes }) => {
       <AppBar
         position="relative"
         color="inherit"
-        className={classes.appBar}
+        classes={{ root: classes.appBar }}
         ref={ref}
       >
-        <form onSubmit={submit}>
-          <Toolbar className={classes.toolBar}>
-            <div className={classes.search}>
-              <InputBase
-                placeholder="Search"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput
-                }}
-                name="username"
-                inputProps={{ "aria-label": "message" }}
-              />
-            </div>
-            <IconButton type="submit" edge="end" aria-label="search">
+        <Toolbar classes={{ root: classes.toolBar }}>
+          <div className={classes.search}>
+            <InputBase
+              placeholder="Search Messenger"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput
+              }}
+              name="username"
+              inputProps={{ "aria-label": "Search Messenger" }}
+              value={username}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+            />
+            <IconButton edge="end" aria-label="search">
               <SearchIcon />
             </IconButton>
-          </Toolbar>
-        </form>
+          </div>
+        </Toolbar>
       </AppBar>
-      <SearchResultList username={username} />
+      {username && <SearchResultList username={username} />}
     </Fragment>
   );
 };

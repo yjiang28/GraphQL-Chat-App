@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Router from "next/router";
-import { useMutation, useSubscription, useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import {
   AppBar,
   Button,
@@ -14,9 +14,6 @@ import { CURRENT_USER_QUERY } from "../gqls/queries/userQueries";
 import { SIGN_OUT_MUTATION } from "../gqls/mutations/userMutations";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1
-  },
   title: {
     flexGrow: 1
   }
@@ -31,7 +28,7 @@ const NavBar = ({ me }) => {
   const logout = async () => {
     try {
       await SignOut();
-      Router.push("/");
+      Router.push("/signin");
     } catch (e) {
       console.log("NavBar", e);
     }
@@ -42,24 +39,22 @@ const NavBar = ({ me }) => {
   };
 
   return (
-    <div className={classes.root}>
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            ChatApp
-          </Typography>
-          {me && <NotificationButton me={me} />}
-          <Button color="inherit" onClick={me ? logout : login}>
-            {me ? "Logout" : "Login / Sign Up"}
-          </Button>
-        </Toolbar>
-      </AppBar>
-    </div>
+    <AppBar position="static" color="primary">
+      <Toolbar>
+        <Typography variant="h6" className={classes.title}>
+          ChatApp
+        </Typography>
+        {me && <NotificationButton me={me} />}
+        <Button color="inherit" onClick={me ? logout : login}>
+          {me ? "Logout" : "Login / Sign Up"}
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 };
 
 NavBar.propTypes = {
-  me: PropTypes.object
+  me: PropTypes.object.isRequired
 };
 
 export default NavBar;

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { UserInputError } from "apollo-server-express";
 import { forwardTo } from "prisma-binding";
 import pubsub from "../pubsub";
-import { notificationTypes, newMessage } from "./Subscription";
+import { notificationTypes, messageType } from "./Subscription";
 
 const { friendRequest, friendRequestAccepted } = notificationTypes;
 
@@ -32,8 +32,18 @@ const Mutation = {
 					channels: []
 				}
 			},
-			info
+			"{id email username}"
 		);
+
+		ctx.db.mutation.createChannel({
+			data: {
+				users: {
+					connect: [{ id: user.id }]
+				},
+				messages: []
+			}
+		});
+
 		// create the JSW token
 		const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// set the JWT as a cookie on the response
@@ -113,7 +123,7 @@ const Mutation = {
 		}
 
 		const { id } = args;
-
+		console.log("hh");
 		const { sender, recipient } = await ctx.db.query.notification(
 			{ where: { id } },
 			"{sender{ id username } recipient{ id username}}"
@@ -189,7 +199,13 @@ const Mutation = {
 			{ where: { id: channelId } },
 			`{users{id}}`
 		);
-		const recipientId = users[0].id == senderId ? users[1].id : users[0].id;
+
+		const recipientId =
+			users.length === 1
+				? senderId
+				: users[0].id == senderId
+				? users[1].id
+				: users[0].id;
 
 		const newMessage = await ctx.db.mutation.createMessage(
 			{
@@ -202,8 +218,7 @@ const Mutation = {
 			},
 			`{id channel{id} recipient{id} sender{id} content}`
 		);
-
-		pubsub.publish(onMessageArrived, { message: newMessage });
+		pubsub.publish(messageType, { message: newMessage });
 		return newMessage;
 	}
 };

@@ -2,3 +2,4 @@
 export const endpoint = "http://localhost:4000/graphql";
 export const subscriptionEndpoint = "ws://localhost:4000/graphql";
 export const frontend = "http://localhost:3000";
+

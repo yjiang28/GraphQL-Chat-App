@@ -56,7 +56,7 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 					<Typography>{content}</Typography>
 				</Grid>
 				{type === "FriendRequest" && (
-					<Grid item className={classes.buttons}>
+					<Grid item classes={{ root: classes.buttons }}>
 						<Button
 							size="small"
 							variant="outlined"

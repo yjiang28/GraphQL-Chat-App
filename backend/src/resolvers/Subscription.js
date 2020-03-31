@@ -6,7 +6,7 @@ const notificationTypes = {
 	friendRequest,
 	friendRequestAccepted
 };
-const message = "newMessage";
+const messageType = "newMessage";
 
 const Subscription = {
 	notification: {
@@ -18,7 +18,7 @@ const Subscription = {
 	},
 	message: {
 		subscribe: withFilter(
-			() => pubsub.asyncIterator(message),
+			() => pubsub.asyncIterator(messageType),
 			(payload, variables) =>
 				payload.message.recipient.id == variables.userId ||
 				payload.message.sender.id == variables.userId
@@ -27,4 +27,4 @@ const Subscription = {
 };
 
 export default Subscription;
-export { notificationTypes, message };
+export { notificationTypes, messageType };

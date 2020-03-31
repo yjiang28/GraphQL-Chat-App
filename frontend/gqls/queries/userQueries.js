@@ -21,4 +21,13 @@ const USER_QUERY = gql`
 	}
 `;
 
-export { CURRENT_USER_QUERY, USER_QUERY };
+const SEARCH_USER_QUERY = gql`
+	query SearchUsers($username: String!) {
+		searchUsers(username: $username) {
+			id
+			username
+		}
+	}
+`;
+
+export { CURRENT_USER_QUERY, USER_QUERY, SEARCH_USER_QUERY };

@@ -66,7 +66,7 @@ const SignUp = ({ classes }) => {
       await SignUp({
         variables: { username, email, password }
       });
-      Router.push("/");
+      Router.push("/chatroom");
     } catch (e) {
       const { graphQLErrors } = e;
 

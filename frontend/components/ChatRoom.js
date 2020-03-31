@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import Router from "next/router";
 import { useMutation, useSubscription, useQuery } from "@apollo/react-hooks";
 import {
 	Container,
@@ -14,41 +15,40 @@ import {
 	CHANNEL_MESSAGES_QUERY,
 	LATEST_ACTIVE_CHANNEL_QUERY
 } from "../gqls/queries/channelQueries";
-import { MESSAGE_SUBSCRIPTION } from "../gqls/subscriptions/channelSubscriptions";
 
 const styles = theme => ({
 	container: {
-		margin: 0,
-		height: `calc(100vh - 64px - ${theme.spacing(0.25)}px)`,
-		padding: 0
+		height: "calc(100vh - 64px - 2px)",
+		maxHeight: "calc(100vh - 64px - 2px)"
 	}
 });
 
 const ChatRoom = ({ classes, query, me }) => {
-	const { channelId } = query;
 	const [messages, setMessages] = useState([]);
 
-	const { data, loading } = useSubscription(MESSAGE_SUBSCRIPTION, {
-		variables: { userId: me.id },
-		onSubscriptionData: ({ data }) => {
-			const { message } = data.data;
-			const { id, content, channel, sender } = message;
-			if (channel.id == channelId && refetch) {
-				refetch();
-			}
-		}
-	});
+	const { data, loading, refetch } = useQuery(LATEST_ACTIVE_CHANNEL_QUERY);
 
-	return (
-		<Grid container spacing={0} className={classes.container}>
+	useEffect(() => {
+		if (data && data.latestActiveChannel) {
+			Router.push({
+				pathname: "/chatroom",
+				query: {
+					channelId: data.latestActiveChannel.id
+				}
+			});
+		}
+	}, [data]);
+
+	return query && query.channelId ? (
+		<Grid container spacing={0} classes={{ root: classes.container }}>
 			<Grid item sm={4} md={3}>
-				<ChannelsPanel />
+				<ChannelsPanel me={me} channelId={query.channelId} />
 			</Grid>
 			<Grid item sm={8} md={9}>
-				<MessagesPanel channelId={channelId} />
+				<MessagesPanel me={me} channelId={query.channelId} />
 			</Grid>
 		</Grid>
-	);
+	) : null;
 };
 
 ChatRoom.propTypes = {

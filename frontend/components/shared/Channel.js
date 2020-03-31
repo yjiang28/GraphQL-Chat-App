@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import Router from "next/router";
@@ -18,18 +18,25 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 
 const styles = theme => ({
 	listItem: {
-		borderRadius: 2 * theme.shape.borderRadius
+		borderRadius: theme.shape.borderRadius
 	},
 	inline: {
 		display: "inline"
 	}
 });
 
-const ChatHead = ({ classes, user, channel }) => {
+const Channel = ({ classes, me, user, channel, active }) => {
 	const { username } = user;
 	const { id: channelId } = channel;
 
 	const [anchorEl, setAnchorEl] = useState(null);
+
+	const handleClick = () => {
+		Router.push({
+			pathname: "/chatroom",
+			query: { channelId }
+		});
+	};
 
 	const deleteContact = () => {};
 
@@ -38,18 +45,17 @@ const ChatHead = ({ classes, user, channel }) => {
 			<ListItem
 				component={Button}
 				alignItems="flex-start"
-				className={classes.listItem}
-				onClick={() => {
-					Router.push({
-						pathname: "/chatroom",
-						query: { channelId }
-					});
-				}}
+				classes={{ root: classes.listItem }}
+				onClick={handleClick}
+				selected={active}
 			>
 				<ListItemAvatar>
 					<Avatar alt={username} src="/static/images/avatar/1.jpg" />
 				</ListItemAvatar>
-				<ListItemText primary={username} secondary={"Let's chat!"} />
+				<ListItemText
+					primary={username == me.username ? "Just You" : username}
+					secondary={"Let's chat!"}
+				/>
 				<ListItemSecondaryAction>
 					<IconButton
 						edge="end"
@@ -65,28 +71,28 @@ const ChatHead = ({ classes, user, channel }) => {
 			<Menu
 				anchorEl={anchorEl}
 				anchorOrigin={{
-					vertical: "top",
+					vertical: "center",
 					horizontal: "right"
 				}}
 				keepMounted
 				transformOrigin={{
 					vertical: "top",
-					horizontal: "right"
+					horizontal: "left"
 				}}
 				open={Boolean(anchorEl)}
 				onClose={() => {
 					setAnchorEl(null);
 				}}
 			>
-				<MenuItem onClick={deleteContact}>Delete this contact</MenuItem>
+				<MenuItem onClick={deleteContact}>Delete</MenuItem>
 			</Menu>
 		</Fragment>
 	);
 };
 
-ChatHead.propTypes = {
+Channel.propTypes = {
 	user: PropTypes.object.isRequired,
 	channel: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(ChatHead);
+export default withStyles(styles)(Channel);

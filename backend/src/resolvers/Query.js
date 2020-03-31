@@ -10,6 +10,20 @@ const Query = {
 		if (!ctx.req.userId) return null;
 		return await ctx.db.query.user({ where: { id: ctx.req.userId } }, info);
 	},
+	async searchUsers(parent, args, ctx, info) {
+		if (!ctx.req.userId) return null;
+		const { username } = args;
+		const users = await ctx.db.query.users(
+			{
+				where: {
+					username_starts_with: username.toLowerCase()
+				}
+			},
+			"{id username}"
+		);
+
+		return users ? users : [];
+	},
 	async latestActiveChannel(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
 		const { userId } = ctx.req;

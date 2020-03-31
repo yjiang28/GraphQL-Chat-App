@@ -5,7 +5,6 @@ const CHANNEL_QUERY = gql`
 	{
 		me {
 			id
-			username
 			channels {
 				id
 				users {

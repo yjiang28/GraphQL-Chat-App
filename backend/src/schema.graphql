@@ -16,6 +16,7 @@ type Query {
 	me: User
 	users(where: UserWhereInput, orderBy: UserOrderByInput): [User]!
 	user(where: UserWhereUniqueInput!): User
+	searchUsers(username: String!): [User]!
 	channel(where: ChannelWhereUniqueInput!): Channel
 	channels(
 		where: ChannelWhereInput

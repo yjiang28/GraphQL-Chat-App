@@ -7,8 +7,8 @@ import SendIcon from "@material-ui/icons/Send";
 const styles = theme => ({
   paper: {
     backgroundColor: theme.palette.grey[200],
-    borderRadius: 4 * theme.shape.borderRadius,
-    padding: theme.spacing(1, 1, 1, 1),
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(1, 2),
     display: "inline-block",
     maxWidth: 500,
     height: "auto",

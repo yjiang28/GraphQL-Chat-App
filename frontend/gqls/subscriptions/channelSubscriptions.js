@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 const MESSAGE_SUBSCRIPTION = gql`
-	subscription OnMessageArrived($userId: ID!) {
+	subscription Message($userId: ID!) {
 		message(userId: $userId) {
 			id
 			content

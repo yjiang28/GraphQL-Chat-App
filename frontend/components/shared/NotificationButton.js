@@ -87,4 +87,8 @@ const NotificationButton = ({ me }) => {
 	);
 };
 
+NotificationButton.propTypes = {
+	me: PropTypes.object.isRequired
+};
+
 export default NotificationButton;

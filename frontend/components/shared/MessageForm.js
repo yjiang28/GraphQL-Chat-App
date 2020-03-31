@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@apollo/react-hooks";
+import PropTypes from "prop-types";
 import {
   withStyles,
   AppBar,
@@ -12,16 +13,14 @@ import { SEND_MESSAGE_MUTATION } from "../../gqls/mutations/channelMutations";
 
 const styles = theme => ({
   appBar: {
-    top: "auto",
-    bottom: 0,
     width: "100%",
     margin: 0
   },
+  toolBar: {
+    padding: theme.spacing(1, 6)
+  },
   message: {
     position: "relative",
-    borderRadius: theme.shape.borderRadius * 3,
-    backgroundColor: theme.palette.grey[200],
-    marginLeft: 0,
     width: "100%",
     [theme.breakpoints.up("sm")]: {
       marginLeft: theme.spacing(1),
@@ -30,16 +29,19 @@ const styles = theme => ({
     flexGrow: 1
   },
   inputRoot: {
-    color: "inherit"
+    height: theme.spacing(5),
+    padding: theme.spacing(1, 2),
+    borderRadius: theme.shape.borderRadius,
+    color: "inherit",
+    backgroundColor: theme.palette.grey[200]
   },
   inputInput: {
-    padding: theme.spacing(1, 1, 1, 7),
     transition: theme.transitions.create("width"),
     width: "100%"
   }
 });
 
-const MessageInputField = ({ classes, channelId }) => {
+const MessageForm = ({ classes, channelId }) => {
   const [SendMessage, _] = useMutation(SEND_MESSAGE_MUTATION);
 
   const sendMessage = async e => {
@@ -57,13 +59,16 @@ const MessageInputField = ({ classes, channelId }) => {
   };
 
   return (
-    <AppBar position="absolute" color="inherit" className={classes.appBar}>
+    <AppBar
+      position="relative"
+      color="inherit"
+      classes={{ root: classes.appBar }}
+    >
       <form onSubmit={sendMessage}>
-        <Toolbar>
+        <Toolbar classes={{ root: classes.toolBar }}>
           <IconButton edge="start" color="primary">
             <KeyboardIcon />
           </IconButton>
-
           <div className={classes.message}>
             <InputBase
               placeholder="Type a message…"
@@ -86,4 +91,8 @@ const MessageInputField = ({ classes, channelId }) => {
   );
 };
 
-export default withStyles(styles)(MessageInputField);
+MessageForm.propTypes = {
+  channelId: PropTypes.string.isRequired
+};
+
+export default withStyles(styles)(MessageForm);
