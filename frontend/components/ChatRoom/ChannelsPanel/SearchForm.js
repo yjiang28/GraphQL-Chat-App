@@ -1,4 +1,5 @@
 import { Fragment, useState, useRef } from "react";
+import PropTypes from "prop-types";
 import {
   AppBar,
   InputBase,
@@ -7,7 +8,7 @@ import {
   withStyles
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import { SearchResultList } from "./";
+import SearchResultList from "./SearchResultList";
 
 const styles = theme => ({
   appBar: {
@@ -45,21 +46,13 @@ const styles = theme => ({
   }
 });
 
-const SearchForm = ({ classes }) => {
+const SearchForm = ({ classes, me }) => {
   const [focused, setFocused] = useState(false);
   const [username, setUsername] = useState("");
   const ref = useRef();
 
   const handleChange = e => {
     setUsername(e.currentTarget.value);
-  };
-
-  const handleFocus = e => {
-    setFocused(true);
-  };
-
-  const handleBlur = e => {
-    setFocused(false);
   };
 
   return (
@@ -82,8 +75,6 @@ const SearchForm = ({ classes }) => {
               inputProps={{ "aria-label": "Search Messenger" }}
               value={username}
               onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
             />
             <IconButton edge="end" aria-label="search">
               <SearchIcon />
@@ -91,9 +82,13 @@ const SearchForm = ({ classes }) => {
           </div>
         </Toolbar>
       </AppBar>
-      {username && <SearchResultList username={username} />}
+      {username && <SearchResultList username={username} me={me} />}
     </Fragment>
   );
+};
+
+SearchForm.propTypes = {
+  me: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(SearchForm);

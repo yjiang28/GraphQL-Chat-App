@@ -11,7 +11,7 @@ import {
   Container,
   withStyles
 } from "@material-ui/core";
-import { TextInputField } from "./shared";
+import TextInputField from "./shared/TextInputField";
 import { CURRENT_USER_QUERY } from "../gqls/queries/userQueries";
 import { SIGN_IN_MUTATION } from "../gqls/mutations/userMutations";
 

@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import KeyboardIcon from "@material-ui/icons/Keyboard";
 import SendIcon from "@material-ui/icons/Send";
-import { SEND_MESSAGE_MUTATION } from "../../gqls/mutations/channelMutations";
+import { SEND_MESSAGE_MUTATION } from "../../../gqls/mutations/channelMutations";
 
 const styles = theme => ({
   appBar: {

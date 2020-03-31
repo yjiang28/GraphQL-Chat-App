@@ -12,8 +12,8 @@ import {
 	withStyles
 } from "@material-ui/core";
 import AddBoxIcon from "@material-ui/icons/AddBox";
-import { SEND_FRIEND_REQUEST_MUTATION } from "../../gqls/mutations/notificationMutations";
-import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
+import { SEND_FRIEND_REQUEST_MUTATION } from "../../../gqls/mutations/notificationMutations";
+import { NOTIFICATIONS_QUERY } from "../../../gqls/queries/notificationQueries";
 
 const styles = theme => ({
 	small: {
@@ -22,7 +22,7 @@ const styles = theme => ({
 	}
 });
 
-const SearchResult = forwardRef(({ classes, username }, ref) => {
+const SearchResult = forwardRef(({ classes, username, me }, ref) => {
 	const [SendFriendRequest, _] = useMutation(SEND_FRIEND_REQUEST_MUTATION, {
 		refetchQueries: [
 			{
@@ -41,20 +41,23 @@ const SearchResult = forwardRef(({ classes, username }, ref) => {
 				<Avatar alt={username} src="" className={classes.small} />
 			</ListItemAvatar>
 			<ListItemText primary={username} />
-			<ListItemSecondaryAction>
-				<IconButton
-					edge="end"
-					aria-label="add"
-					onClick={sendFriendRequest}
-				>
-					<AddBoxIcon />
-				</IconButton>
-			</ListItemSecondaryAction>
+			{username !== me.username && (
+				<ListItemSecondaryAction>
+					<IconButton
+						edge="end"
+						aria-label="add"
+						onClick={sendFriendRequest}
+					>
+						<AddBoxIcon />
+					</IconButton>
+				</ListItemSecondaryAction>
+			)}
 		</ListItem>
 	);
 });
 
 SearchResult.propTypes = {
+	me: PropTypes.object.isRequired,
 	username: PropTypes.string.isRequired
 };
 

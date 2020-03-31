@@ -12,6 +12,7 @@ const Query = {
 	},
 	async searchUsers(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
+
 		const { username } = args;
 		const users = await ctx.db.query.users(
 			{

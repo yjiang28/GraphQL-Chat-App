@@ -15,11 +15,12 @@ import {
 	List,
 	withStyles
 } from "@material-ui/core";
-import { ChannelsPanel, MessagesPanel } from "./shared";
+import ChannelsPanel from "./ChannelsPanel";
+import MessagesPanel from "./MessagesPanel";
 import {
 	CHANNEL_MESSAGES_QUERY,
 	LATEST_ACTIVE_CHANNEL_QUERY
-} from "../gqls/queries/channelQueries";
+} from "../../gqls/queries/channelQueries";
 
 const styles = theme => ({
 	container: {

@@ -3,7 +3,7 @@ import { useMutation, useSubscription, useQuery } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
 import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import { Notification } from "./";
+import Notification from "./Notification";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
 import { NOTIFICATION_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
 

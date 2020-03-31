@@ -46,7 +46,7 @@ const App = ({ me, pathname, query }) => {
 
 	return (
 		<ThemeProvider theme={theme}>
-			{me && <NavBar me={me} />}
+			<NavBar me={me} />
 			{me && pathname && query ? (
 				<ChatRoom me={me} query={query} />
 			) : pathname == "/signup" ? (
@@ -59,7 +59,7 @@ const App = ({ me, pathname, query }) => {
 };
 
 App.propTypes = {
-	me: PropTypes.object.isRequired,
+	me: PropTypes.object,
 	pathname: PropTypes.string.isRequired,
 	query: PropTypes.object.isRequired
 };

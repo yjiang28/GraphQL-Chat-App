@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQuery, useSubscription } from "@apollo/react-hooks";
 import { Paper, Grid, Typography, List, withStyles } from "@material-ui/core";
-import { Message, MessageBanner, MessageForm } from "./";
-import { CHANNEL_MESSAGES_QUERY } from "../../gqls/queries/channelQueries";
-import { MESSAGE_SUBSCRIPTION } from "../../gqls/subscriptions/channelSubscriptions";
+import Message from "./Message";
+import MessageBanner from "./MessageBanner";
+import MessageForm from "./MessageForm";
+import { CHANNEL_MESSAGES_QUERY } from "../../../gqls/queries/channelQueries";
+import { MESSAGE_SUBSCRIPTION } from "../../../gqls/subscriptions/channelSubscriptions";
 
 const styles = theme => ({
 	container: {

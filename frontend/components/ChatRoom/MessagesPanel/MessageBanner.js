@@ -10,8 +10,9 @@ import {
 	List,
 	withStyles
 } from "@material-ui/core";
-import { Message, MessageForm } from "./";
-import { ACTIVE_CHANNEL_QUERY } from "../../gqls/queries/channelQueries";
+import Message from "./Message";
+import MessageForm from "./MessageForm";
+import { ACTIVE_CHANNEL_QUERY } from "../../../gqls/queries/channelQueries";
 
 const styles = theme => ({
 	container: {

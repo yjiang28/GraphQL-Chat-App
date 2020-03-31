@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
 import { List, ListItem, withStyles } from "@material-ui/core";
-import { SearchResult } from "./";
-import { USER_QUERY, SEARCH_USER_QUERY } from "../../gqls/queries/userQueries";
+import SearchResult from "./SearchResult";
+import {
+	USER_QUERY,
+	SEARCH_USER_QUERY
+} from "../../../gqls/queries/userQueries";
 
 const styles = theme => ({
 	root: {
@@ -19,7 +22,7 @@ const styles = theme => ({
 	}
 });
 
-const SearchResultList = ({ classes, username }) => {
+const SearchResultList = ({ classes, username, me }) => {
 	const { data, loading, refetch } = useQuery(SEARCH_USER_QUERY, {
 		variables: { username: username.toLowerCase() }
 	});
@@ -32,7 +35,7 @@ const SearchResultList = ({ classes, username }) => {
 		if (loading) return <ListItem>Loading...</ListItem>;
 		if (data && data.searchUsers && data.searchUsers.length > 0) {
 			return data.searchUsers.map(user => (
-				<SearchResult username={user.username} key={user.id} />
+				<SearchResult username={user.username} key={user.id} me={me} />
 			));
 		}
 		return <ListItem>No result found</ListItem>;
@@ -42,6 +45,7 @@ const SearchResultList = ({ classes, username }) => {
 };
 
 SearchResultList.propTypes = {
+	me: PropTypes.object.isRequired,
 	username: PropTypes.string.isRequired
 };
 

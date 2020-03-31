@@ -9,9 +9,10 @@ import {
   Typography,
   makeStyles
 } from "@material-ui/core";
-import { ProfileButton, NotificationButton } from "./shared/";
-import { CURRENT_USER_QUERY } from "../gqls/queries/userQueries";
-import { SIGN_OUT_MUTATION } from "../gqls/mutations/userMutations";
+import ProfileButton from "./ProfileButton";
+import NotificationButton from "./NotificationButton";
+import { CURRENT_USER_QUERY } from "../../gqls/queries/userQueries";
+import { SIGN_OUT_MUTATION } from "../../gqls/mutations/userMutations";
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -63,7 +64,7 @@ const NavBar = ({ me }) => {
 };
 
 NavBar.propTypes = {
-  me: PropTypes.object.isRequired
+  me: PropTypes.object
 };
 
 export default NavBar;
