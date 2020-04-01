@@ -9,6 +9,20 @@ import { notificationTypes, messageType } from "./Subscription";
 const admin = "administrator";
 const { friendRequest, friendRequestAccepted } = notificationTypes;
 
+const processUsername = username => {
+	const res = username
+		.toLowerCase()
+		.split(" ")
+		.reduce((acc, part) => {
+			const letters = part.split("");
+			letters[0] = letters[0].toUpperCase();
+			acc.push(letters.join(""));
+			return acc;
+		}, [])
+		.join(" ");
+	return res;
+};
+
 const Mutation = {
 	async signUp(parent, args, ctx, info) {
 		const username = args.username.toLowerCase();
@@ -68,7 +82,7 @@ const Mutation = {
 	async signIn(parent, args, ctx, info) {
 		const email = args.email.toLowerCase();
 		const password = args.password;
-		const user = await ctx.db.query.user({ where: { email } });
+		const user = await ctx.db.query.user({ where: { email } }, info);
 		if (!user)
 			throw new UserInputError("No such email registered", {
 				invalidArgs: ["email"]
@@ -118,7 +132,7 @@ const Mutation = {
 					content: `User ${senderUsername} sent you a friend request!`
 				}
 			},
-			`{id type content recipient{id} createdAt}`
+			info
 		);
 
 		pubsub.publish(friendRequest, {
@@ -150,7 +164,9 @@ const Mutation = {
 						connect: { id: recipient.id }
 					},
 					type: friendRequestAccepted,
-					content: `You became friends with ${sender.username}.`
+					content: `You became friends with ${processUsername(
+						sender.username
+					)}.`
 				}
 			},
 			"{id type content sender{id username} recipient{id username}}"
@@ -166,7 +182,9 @@ const Mutation = {
 						connect: { id: sender.id }
 					},
 					type: friendRequestAccepted,
-					content: `You became friends with ${recipient.username}.`
+					content: `You became friends with ${processUsername(
+						recipient.username
+					)}.`
 				}
 			},
 			"{id type content sender{id username} recipient{id username}}"
@@ -195,24 +213,14 @@ const Mutation = {
 							{
 								sender: { connect: { username: admin } },
 								recipient: { connect: { id: recipient.id } },
-								content: `You are now friends with ${
-									sender.username
-								}`
-							}
-						],
-						create: [
-							{
-								sender: { connect: { username: admin } },
-								recipient: { connect: { id: sender.id } },
-								content: `You are now friends with ${
-									recipient.username
-								}`
+								content:
+									"This is the beginning of your conversation."
 							}
 						]
 					}
 				}
 			},
-			"{id users{id username}}"
+			info
 		);
 
 		return channel;
@@ -246,7 +254,7 @@ const Mutation = {
 					channel: { connect: { id: channelId } }
 				}
 			},
-			`{id channel{id} recipient{id} sender{id} content}`
+			info
 		);
 		pubsub.publish(messageType, { message: newMessage });
 		return newMessage;

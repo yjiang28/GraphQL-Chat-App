@@ -10,6 +10,18 @@ const CHANNEL_QUERY = gql`
 				username
 				avatar
 			}
+			messages {
+				id
+				sender {
+					id
+					username
+				}
+				recipient {
+					id
+					username
+				}
+				content
+			}
 		}
 	}
 `;
@@ -31,6 +43,18 @@ const ACTIVE_CHANNEL_QUERY = gql`
 				id
 				username
 				avatar
+			}
+			messages {
+				id
+				sender {
+					id
+					username
+				}
+				recipient {
+					id
+					username
+				}
+				content
 			}
 		}
 	}
@@ -58,6 +82,23 @@ const LATEST_ACTIVE_CHANNEL_QUERY = gql`
 	{
 		latestActiveChannel {
 			id
+			users {
+				id
+				username
+				avatar
+			}
+			messages {
+				id
+				sender {
+					id
+					username
+				}
+				recipient {
+					id
+					username
+				}
+				content
+			}
 		}
 	}
 `;

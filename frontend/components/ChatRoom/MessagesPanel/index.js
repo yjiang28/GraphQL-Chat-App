@@ -1,12 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { useMutation, useQuery, useSubscription } from "@apollo/react-hooks";
+import {
+	useMutation,
+	useQuery,
+	useSubscription,
+	useApolloClient
+} from "@apollo/react-hooks";
 import { Paper, Grid, Typography, List, withStyles } from "@material-ui/core";
 import Message from "./Message";
 import MessageBanner from "./MessageBanner";
 import MessageForm from "./MessageForm";
 import { DualBallLoader } from "../../shared/loaders";
-import { CHANNEL_MESSAGES_QUERY } from "../../../gqls/queries/channelQueries";
+import {
+	CHANNEL_QUERY,
+	CHANNEL_MESSAGES_QUERY,
+	ACTIVE_CHANNEL_QUERY,
+	LATEST_CHANNEL_MESSAGE_QUERY
+} from "../../../gqls/queries/channelQueries";
 import { MESSAGE_SUBSCRIPTION } from "../../../gqls/subscriptions/channelSubscriptions";
 
 const styles = theme => ({
@@ -29,24 +39,47 @@ const scrollToBottom = messagesEndRef => {
 	messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 };
 
-const MessagesPanel = ({ classes, me, channelId }) => {
+const MessagesPanel = ({ classes, me, channel }) => {
+	const client = useApolloClient();
 	const messagesEndRef = useRef();
 
-	const { data, loading, refetch } = useQuery(CHANNEL_MESSAGES_QUERY, {
-		variables: { channelId },
+	const { refetch } = useQuery(ACTIVE_CHANNEL_QUERY, {
 		onError: e => {
-			console.log("MessagesPanel: CHANNEL_MESSAGES_QUERY:", e);
+			console.log("MessagesPanel: ACTIVE_CHANNEL_QUERY:", e);
 		}
 	});
+
+	const { refetch: channelsRefetch } = useQuery(CHANNEL_QUERY, {
+		onError: e => {
+			console.log("MessagesPanel: CHANNEL_QUERY:", e);
+		}
+	});
+
+	const { refetch: latestChannelMessageRefetch } = useQuery(
+		LATEST_CHANNEL_MESSAGE_QUERY,
+		{
+			variables: { channelId: channel.id },
+			onError: e => {
+				console.log("MessagesPanel: LATEST_CHANNEL_MESSAGE_QUERY: ", e);
+			}
+		}
+	);
 
 	useSubscription(MESSAGE_SUBSCRIPTION, {
 		variables: { userId: me.id },
 		onSubscriptionData: ({ subscriptionData }) => {
 			const { message } = subscriptionData.data;
-			const { channel } = message;
-			if (channel.id == channelId && refetch) {
+
+			const updatedActiveChannel = { ...channel };
+			updatedActiveChannel.messages.push(message);
+			client.writeData({
+				data: { activeChannel: updatedActiveChannel }
+			});
+			if (channel.id === message.channel.id) {
 				refetch();
-			}
+				latestChannelMessageRefetch();
+				scrollToBottom(messagesEndRef);
+			} else if (channelsRefetch) channelsRefetch();
 		},
 		onError: e => {
 			console.log("MessagesPanel: MESSAGE_SUBSCRIPTION:", e);
@@ -54,32 +87,25 @@ const MessagesPanel = ({ classes, me, channelId }) => {
 	});
 
 	useEffect(() => {
-		if (channelId && refetch) refetch();
-	}, [channelId]);
-
-	useEffect(() => {
 		scrollToBottom(messagesEndRef);
-	}, [data]);
+	}, []);
 
 	const messgageItems = () => {
-		if (loading)
-			return (
-				<Grid item>
-					<DualBallLoader aria-label="Loading messages" />
-				</Grid>
-			);
-		if (data && data.channelMessages) {
-			const messages = data.channelMessages;
-			return messages.map(msg => (
-				<Message message={msg} me={me} key={msg.id} />
-			));
-		}
-		return <div>Error...</div>;
+		const { messages, users } = channel;
+		const user =
+			users.length === 0
+				? me
+				: users[0].username === me.username
+				? users[1]
+				: users[0];
+		return messages.map(msg => (
+			<Message message={msg} me={me} key={msg.id} />
+		));
 	};
 
 	return (
 		<Paper classes={{ root: classes.container }} square>
-			<MessageBanner me={me} />
+			<MessageBanner me={me} channel={channel} />
 			<Paper
 				classes={{ root: classes.messagesPaper }}
 				square
@@ -90,14 +116,14 @@ const MessagesPanel = ({ classes, me, channelId }) => {
 					<Grid item ref={messagesEndRef} />
 				</Grid>
 			</Paper>
-			<MessageForm channelId={channelId} />
+			<MessageForm channel={channel} />
 		</Paper>
 	);
 };
 
 MessagesPanel.propTypes = {
 	me: PropTypes.object.isRequired,
-	channelId: PropTypes.string.isRequired
+	channel: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(MessagesPanel);

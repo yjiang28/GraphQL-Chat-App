@@ -16,7 +16,10 @@ import {
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import { processUsername } from "../../../scripts/utils";
-import { LATEST_CHANNEL_MESSAGE_QUERY } from "../../../gqls/queries/channelQueries";
+import {
+	LATEST_CHANNEL_MESSAGE_QUERY,
+	ACTIVE_CHANNEL_QUERY
+} from "../../../gqls/queries/channelQueries";
 
 const styles = theme => ({
 	listItem: {
@@ -26,7 +29,8 @@ const styles = theme => ({
 		display: "inline"
 	},
 	username: {
-		textTransform: "none"
+		textTransform: "none",
+		textOverflow: "ellipsis"
 	}
 });
 
@@ -44,12 +48,19 @@ const Channel = ({ classes, me, user, channel, active }) => {
 		}
 	});
 
+	const { refetch } = useQuery(ACTIVE_CHANNEL_QUERY, {
+		onError: e => {
+			console.log("MessagesPanel: ACTIVE_CHANNEL_QUERY:", e);
+		}
+	});
+
 	const handleClick = () => {
 		Router.push({
 			pathname: "/chatroom",
 			query: { channelId }
 		});
 		client.writeData({ data: { activeChannel: channel } });
+		if (refetch) refetch();
 	};
 
 	const deleteChannel = () => {};
@@ -82,7 +93,7 @@ const Channel = ({ classes, me, user, channel, active }) => {
 					secondary={data ? data.latestChannelMessage.content : ""}
 					classes={{ root: classes.username }}
 				/>
-				<ListItemSecondaryAction>
+				{/*<ListItemSecondaryAction>
 					<IconButton
 						edge="end"
 						aria-label="delete"
@@ -92,7 +103,7 @@ const Channel = ({ classes, me, user, channel, active }) => {
 					>
 						<MoreHorizIcon />
 					</IconButton>
-				</ListItemSecondaryAction>
+				</ListItemSecondaryAction>**/}
 			</ListItem>
 			<Menu
 				anchorEl={anchorEl}

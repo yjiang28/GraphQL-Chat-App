@@ -7,6 +7,15 @@ const MESSAGE_SUBSCRIPTION = gql`
 			channel {
 				id
 			}
+			sender {
+				id
+				username
+			}
+			recipient {
+				id
+				username
+			}
+			content
 		}
 	}
 `;

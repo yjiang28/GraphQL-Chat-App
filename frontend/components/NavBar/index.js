@@ -28,8 +28,8 @@ const NavBar = ({ me }) => {
   const [SignOut, _] = useMutation(SIGN_OUT_MUTATION, {
     refetchQueries: [{ query: CURRENT_USER_QUERY }],
     onCompleted: data => {
-      Router.push("/signin");
       client.resetStore();
+      Router.push("/signin");
     },
     onError: e => {
       console.log("NavBar: SIGN_OUT_MUTATION:", e);

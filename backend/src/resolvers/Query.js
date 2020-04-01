@@ -1,13 +1,24 @@
 import { forwardTo } from "prisma-binding";
 import pubsub from "../pubsub";
+const admin = "administrator";
 
 const Query = {
 	async me(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
-		return await ctx.db.query.user(
-			{ where: { id: ctx.req.userId } },
-			"{id username email avatar}"
+		return await ctx.db.query.user({ where: { id: ctx.req.userId } }, info);
+	},
+	async notifications(parent, args, ctx, info) {
+		if (!ctx.req.userId) return null;
+		const { userId } = ctx.req;
+		const notifications = await ctx.db.query.notifications(
+			{
+				where: { recipient: { id: userId } },
+				orderBy: "createdAt_DESC"
+			},
+			info
 		);
+
+		return notifications;
 	},
 	async searchUsers(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
@@ -16,7 +27,8 @@ const Query = {
 		const users = await ctx.db.query.users(
 			{
 				where: {
-					username_starts_with: username.toLowerCase()
+					username_starts_with: username.toLowerCase(),
+					username_not: admin
 				}
 			},
 			info
@@ -32,7 +44,7 @@ const Query = {
 				where: { users_some: { id: userId } },
 				orderBy: "updatedAt_DESC"
 			},
-			"{id users{id username}}"
+			info
 		);
 		return channels;
 	},
@@ -56,10 +68,9 @@ const Query = {
 		const messages = await ctx.db.query.messages(
 			{
 				where: {
-					channel: { id: channelId },
-					recipient: { id: userId }
+					channel: { id: channelId }
 				},
-				orderBy: "createdAt_ASC",
+				orderBy: "createdAt_DESC",
 				first: 1
 			},
 			info

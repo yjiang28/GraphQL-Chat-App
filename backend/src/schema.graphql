@@ -15,6 +15,7 @@ type Mutation {
 type Query {
 	me: User
 	searchUsers(username: String!): [User]!
+	notifications: [Notification]!
 	channels: [Channel]!
 	latestActiveChannel: Channel!
 	latestChannelMessage(channelId: ID!): Message!

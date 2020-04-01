@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
-import { List, ListItem, withStyles } from "@material-ui/core";
+import { List, ListItem, ListItemText, withStyles } from "@material-ui/core";
 import SearchResult from "./SearchResult";
 import { DualBallLoader } from "../../shared/loaders";
 import {
@@ -47,7 +47,11 @@ const SearchResultList = ({ classes, username, me }) => {
 				<SearchResult user={user} key={user.id} me={me} />
 			));
 		}
-		return <ListItem>No result found</ListItem>;
+		return (
+			<ListItem>
+				<ListItemText primary="No matched user found." />
+			</ListItem>
+		);
 	};
 
 	return <List classes={{ root: classes.root }}>{results()}</List>;

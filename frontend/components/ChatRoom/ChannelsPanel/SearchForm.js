@@ -70,7 +70,10 @@ const SearchForm = ({ classes, me }) => {
                 input: classes.inputInput
               }}
               name="username"
-              inputProps={{ "aria-label": "Search Messenger" }}
+              inputProps={{
+                "aria-label": "Search Messenger"
+              }}
+              autoComplete="off"
               value={username}
               onChange={handleChange}
             />

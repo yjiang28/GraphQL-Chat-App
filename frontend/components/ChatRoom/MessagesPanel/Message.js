@@ -1,11 +1,10 @@
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
-import { withStyles, Grid, Paper, Typography } from "@material-ui/core";
+import { withStyles, Avatar, Grid, Paper, Typography } from "@material-ui/core";
 import KeyboardIcon from "@material-ui/icons/Keyboard";
 import SendIcon from "@material-ui/icons/Send";
 
 const styles = theme => ({
-  admin: {},
   message: {
     backgroundColor: theme.palette.grey[200],
     borderRadius: theme.shape.borderRadius,
@@ -44,7 +43,7 @@ const Message = ({ classes, message, me }) => {
         }
       >
         <Grid item>
-          <div className={sender === admin ? classes.admin : classes.message}>
+          <div className={sender === admin ? "" : classes.message}>
             <Typography display="inline">{message.content}</Typography>
           </div>
         </Grid>

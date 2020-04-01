@@ -28,29 +28,19 @@ const styles = theme => ({
 	}
 });
 
-const MessageBanner = ({ classes, me }) => {
-	const [recipient, setRecipient] = useState("");
-	const { data } = useQuery(ACTIVE_CHANNEL_QUERY, {
-		onError: e => {
-			console.log("MessageBanner: ACTIVE_CHANNEL_QUERY:", e);
-		}
-	});
+const MessageBanner = ({ classes, me, channel }) => {
+	const [recipient, setRecipient] = useState(null);
 
 	useEffect(() => {
-		if (data && data.activeChannel) {
-			const { users } = data.activeChannel;
-			if (users.length == 1) setRecipient(processUsername(me.username));
-			else {
+		if (channel) {
+			const { users } = channel;
+			if (users.length == 1) setRecipient(me);
+			else
 				setRecipient(
-					processUsername(
-						users[0].username === me.username
-							? users[1].username
-							: users[0].username
-					)
+					users[0].username === me.username ? users[1] : users[0]
 				);
-			}
 		}
-	}, [data]);
+	}, [channel]);
 
 	return recipient ? (
 		<Paper classes={{ root: classes.container }} square variant="outlined">
@@ -62,11 +52,16 @@ const MessageBanner = ({ classes, me }) => {
 			>
 				<Grid item>
 					<IconButton>
-						<Avatar alt={recipient} src="" />
+						<Avatar
+							alt={processUsername(recipient.username)}
+							src={recipient.avatar}
+						/>
 					</IconButton>
 				</Grid>
 				<Grid item>
-					<Typography>{recipient}</Typography>
+					<Typography>
+						{processUsername(recipient.username)}
+					</Typography>
 				</Grid>
 			</Grid>
 		</Paper>
@@ -74,8 +69,8 @@ const MessageBanner = ({ classes, me }) => {
 };
 
 MessageBanner.propTypes = {
-	me: PropTypes.object,
-	channelId: PropTypes.string
+	me: PropTypes.object.isRequired,
+	channel: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(MessageBanner);

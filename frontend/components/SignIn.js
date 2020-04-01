@@ -77,7 +77,7 @@ const SignIn = ({ classes }) => {
     const password = formData.get("password");
 
     SignIn({
-      variables: { email, password }
+      variables: { email, password: String(password) }
     });
   };
 

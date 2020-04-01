@@ -10,6 +10,7 @@ import {
 import KeyboardIcon from "@material-ui/icons/Keyboard";
 import SendIcon from "@material-ui/icons/Send";
 import { SEND_MESSAGE_MUTATION } from "../../../gqls/mutations/channelMutations";
+import { LATEST_CHANNEL_MESSAGE_QUERY } from "../../../gqls/queries/channelQueries";
 
 const styles = theme => ({
   appBar: {
@@ -41,7 +42,7 @@ const styles = theme => ({
   }
 });
 
-const MessageForm = ({ classes, channelId }) => {
+const MessageForm = ({ classes, channel }) => {
   const [SendMessage, _] = useMutation(SEND_MESSAGE_MUTATION, {
     onError: e => {
       console.log("MessageForm : SEND_MESSAGE_MUTATION:", e);
@@ -54,7 +55,7 @@ const MessageForm = ({ classes, channelId }) => {
     const message = formData.get("message");
     e.target.reset();
     SendMessage({
-      variables: { channelId, message }
+      variables: { channelId: channel.id, message }
     });
   };
 
@@ -92,7 +93,7 @@ const MessageForm = ({ classes, channelId }) => {
 };
 
 MessageForm.propTypes = {
-  channelId: PropTypes.string.isRequired
+  channel: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(MessageForm);

@@ -5,6 +5,10 @@ const SEND_FRIEND_REQUEST_MUTATION = gql`
 		sendFriendRequest(username: $username) {
 			id
 			content
+			recipient {
+				id
+				username
+			}
 		}
 	}
 `;

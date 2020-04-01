@@ -54,19 +54,14 @@ const NotificationButton = ({ me }) => {
 	};
 
 	useEffect(() => {
-		if (
-			data &&
-			data.me &&
-			data.me.notifications &&
-			data.me.notifications.length > 0
-		)
+		if (data && data.notifications && data.notifications.length > 0)
 			setNewNotif(true);
 	}, [data]);
 
 	const notifications = () => {
 		if (loading) return <MenuItem>Loading... </MenuItem>;
-		if (data && data.me && data.me.notifications) {
-			const { notifications } = data.me;
+		if (data && data.notifications) {
+			const { notifications } = data;
 			if (notifications.length === 0)
 				return <MenuItem>No unread notifications</MenuItem>;
 			else

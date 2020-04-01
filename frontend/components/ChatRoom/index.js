@@ -34,39 +34,38 @@ const ChatRoom = ({ classes, query, me }) => {
 	const client = useApolloClient();
 	const [messages, setMessages] = useState([]);
 
-	const { data } = useQuery(LATEST_ACTIVE_CHANNEL_QUERY, {
+	useQuery(LATEST_ACTIVE_CHANNEL_QUERY, {
+		onCompleted: data => {
+			if (data && data.latestActiveChannel) {
+				client.writeData({
+					data: { activeChannel: data.latestActiveChannel }
+				});
+				Router.push({
+					pathname: "/chatroom",
+					query: {
+						channelId: data.latestActiveChannel.id
+					}
+				});
+			}
+		},
 		onError: e => {
 			console.log("ChatRoom: LATEST_ACTIVE_CHANNEL_QUERY:", e);
 		}
 	});
 
-	useEffect(() => {
-		if (data && data.latestActiveChannel) {
-			client.writeData({
-				data: { activeChannel: data.latestActiveChannel }
-			});
-			Router.push({
-				pathname: "/chatroom",
-				query: {
-					channelId: data.latestActiveChannel.id
-				}
-			});
-		}
-	}, [data]);
-
-	const { data: localData } = useQuery(ACTIVE_CHANNEL_QUERY, {
+	const { data } = useQuery(ACTIVE_CHANNEL_QUERY, {
 		onError: e => {
-			console.log("MessagesPanel: ACTIVE_CHANNEL_QUERY:", e);
+			console.log("ChatRoom: ACTIVE_CHANNEL_QUERY:", e);
 		}
 	});
 
-	return localData && localData.activeChannel ? (
+	return data && data.activeChannel ? (
 		<Grid container spacing={0} classes={{ root: classes.container }}>
 			<Grid item sm={4} md={3}>
-				<ChannelsPanel me={me} channelId={localData.activeChannel.id} />
+				<ChannelsPanel me={me} channelId={data.activeChannel.id} />
 			</Grid>
 			<Grid item sm={8} md={9}>
-				<MessagesPanel me={me} channelId={localData.activeChannel.id} />
+				<MessagesPanel me={me} channel={data.activeChannel} />
 			</Grid>
 		</Grid>
 	) : null;

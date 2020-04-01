@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from "react";
+import { Fragment, useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
 import {
@@ -9,6 +9,7 @@ import {
 	ListItemSecondaryAction,
 	IconButton,
 	Typography,
+	Snackbar,
 	withStyles
 } from "@material-ui/core";
 import AddBoxIcon from "@material-ui/icons/AddBox";
@@ -34,33 +35,54 @@ const SearchResult = forwardRef(({ classes, user, me }, ref) => {
 	});
 
 	const sendFriendRequest = () => {
+		seSnackbar(true);
 		SendFriendRequest({ variables: { username } });
 	};
 
+	const [snackbar, seSnackbar] = React.useState(false);
+
+	const handleClose = () => {
+		seSnackbar(false);
+	};
+
+	const displayedUsername = processUsername(username);
+
 	return (
-		<ListItem button>
-			<ListItemAvatar>
-				<Avatar alt={username} src={avatar} className={classes.small} />
-			</ListItemAvatar>
-			<ListItemText primary={processUsername(username)} />
-			{username !== me.username && (
-				<ListItemSecondaryAction>
-					<IconButton
-						edge="end"
-						aria-label="add"
-						onClick={sendFriendRequest}
-					>
-						<AddBoxIcon />
-					</IconButton>
-				</ListItemSecondaryAction>
-			)}
-		</ListItem>
+		<Fragment>
+			<ListItem button>
+				<ListItemAvatar>
+					<Avatar
+						alt={username}
+						src={avatar}
+						className={classes.small}
+					/>
+				</ListItemAvatar>
+				<ListItemText primary={displayedUsername} />
+				{username !== me.username && (
+					<ListItemSecondaryAction>
+						<IconButton
+							edge="end"
+							aria-label="add"
+							onClick={sendFriendRequest}
+						>
+							<AddBoxIcon />
+						</IconButton>
+					</ListItemSecondaryAction>
+				)}
+			</ListItem>
+			<Snackbar
+				anchorOrigin={{ vertical: "center", horizontal: "center" }}
+				open={snackbar}
+				onClose={handleClose}
+				message={`Your friend request has been sent to ${displayedUsername}`}
+			/>
+		</Fragment>
 	);
 });
 
 SearchResult.propTypes = {
 	me: PropTypes.object.isRequired,
-	user: PropTypes.string.isRequired
+	user: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(SearchResult);
