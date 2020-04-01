@@ -1,10 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import faker from "faker";
 import { UserInputError } from "apollo-server-express";
 import { forwardTo } from "prisma-binding";
 import pubsub from "../pubsub";
 import { notificationTypes, messageType } from "./Subscription";
 
+const admin = "administrator";
 const { friendRequest, friendRequestAccepted } = notificationTypes;
 
 const Mutation = {
@@ -12,7 +14,8 @@ const Mutation = {
 		const username = args.username.toLowerCase();
 		const email = args.email.toLowerCase();
 		const password = await bcrypt.hash(args.password, 6);
-		let invalidArgs = [];
+
+		const invalidArgs = [];
 		if (await ctx.db.query.user({ where: { username } }))
 			invalidArgs.push("username");
 		if (await ctx.db.query.user({ where: { email } }))
@@ -22,25 +25,33 @@ const Mutation = {
 				invalidArgs
 			});
 
+		const avatar = faker.image.avatar();
 		const user = await ctx.db.mutation.createUser(
 			{
 				data: {
 					username,
 					email,
 					password,
+					avatar,
 					notifications: [],
 					channels: []
 				}
 			},
-			"{id email username}"
+			info
 		);
 
-		ctx.db.mutation.createChannel({
+		const channel = ctx.db.mutation.createChannel({
 			data: {
-				users: {
-					connect: [{ id: user.id }]
-				},
-				messages: []
+				users: { connect: [{ username }] },
+				messages: {
+					create: [
+						{
+							sender: { connect: { username: admin } },
+							recipient: { connect: { username } },
+							content: "This is your space."
+						}
+					]
+				}
 			}
 		});
 
@@ -101,7 +112,7 @@ const Mutation = {
 						connect: { username: senderUsername }
 					},
 					recipient: {
-						connect: { username: recipientUsername }
+						connect: { username: recipientUsername.toLowerCase() }
 					},
 					type: friendRequest,
 					content: `User ${senderUsername} sent you a friend request!`
@@ -179,7 +190,26 @@ const Mutation = {
 					users: {
 						connect: [{ id: recipient.id }, { id: sender.id }]
 					},
-					messages: []
+					messages: {
+						create: [
+							{
+								sender: { connect: { username: admin } },
+								recipient: { connect: { id: recipient.id } },
+								content: `You are now friends with ${
+									sender.username
+								}`
+							}
+						],
+						create: [
+							{
+								sender: { connect: { username: admin } },
+								recipient: { connect: { id: sender.id } },
+								content: `You are now friends with ${
+									recipient.username
+								}`
+							}
+						]
+					}
 				}
 			},
 			"{id users{id username}}"

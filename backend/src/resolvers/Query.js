@@ -2,13 +2,12 @@ import { forwardTo } from "prisma-binding";
 import pubsub from "../pubsub";
 
 const Query = {
-	user: forwardTo("db"),
-	users: forwardTo("db"),
-	channel: forwardTo("db"),
-	channels: forwardTo("db"),
 	async me(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
-		return await ctx.db.query.user({ where: { id: ctx.req.userId } }, info);
+		return await ctx.db.query.user(
+			{ where: { id: ctx.req.userId } },
+			"{id username email avatar}"
+		);
 	},
 	async searchUsers(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
@@ -20,7 +19,7 @@ const Query = {
 					username_starts_with: username.toLowerCase()
 				}
 			},
-			"{id username}"
+			info
 		);
 
 		return users ? users : [];
@@ -28,13 +27,14 @@ const Query = {
 	async channels(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
 		const { userId } = ctx.req;
-		return await ctx.db.query.channels(
+		const channels = await ctx.db.query.channels(
 			{
 				where: { users_some: { id: userId } },
 				orderBy: "updatedAt_DESC"
 			},
 			"{id users{id username}}"
 		);
+		return channels;
 	},
 	async latestActiveChannel(parent, args, ctx, info) {
 		if (!ctx.req.userId) return null;
@@ -49,23 +49,35 @@ const Query = {
 		);
 		return channels[0];
 	},
+	async latestChannelMessage(parent, args, ctx, info) {
+		if (!ctx.req.userId) return null;
+		const { userId } = ctx.req;
+		const { channelId } = args;
+		const messages = await ctx.db.query.messages(
+			{
+				where: {
+					channel: { id: channelId },
+					recipient: { id: userId }
+				},
+				orderBy: "createdAt_ASC",
+				first: 1
+			},
+			info
+		);
+
+		return messages[0];
+	},
 	async channelMessages(parent, args, ctx, info) {
-		// get messages from the channel specified by args.id and sorted ascendingly by createdAt
 		if (!ctx.req.userId) return null;
 		const { channelId } = args;
 		return await ctx.db.query.messages(
 			{
-				where: {
-					channel: {
-						id: channelId
-					}
-				},
+				where: { channel: { id: channelId } },
 				orderBy: "createdAt_ASC"
 			},
 			info
 		);
-	},
-	messages: forwardTo("db")
+	}
 };
 
 export default Query;

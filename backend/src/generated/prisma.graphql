@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/lillyj970920/chat-app/dev
-# timestamp: Tue Mar 31 2020 00:42:55 GMT+0800 (China Standard Time)
+# timestamp: Wed Apr 01 2020 02:35:48 GMT+0800 (China Standard Time)
 
 type AggregateChannel {
   count: Int!
@@ -1267,6 +1267,7 @@ type User implements Node {
   username: String!
   email: String!
   password: String!
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   notifications(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Notification!]
@@ -1288,6 +1289,7 @@ input UserCreateInput {
   username: String!
   email: String!
   password: String!
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   notifications: NotificationCreateManyWithoutRecipientInput
@@ -1314,6 +1316,7 @@ input UserCreateWithoutChannelsInput {
   username: String!
   email: String!
   password: String!
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   notifications: NotificationCreateManyWithoutRecipientInput
@@ -1324,6 +1327,7 @@ input UserCreateWithoutNotificationsInput {
   username: String!
   email: String!
   password: String!
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   channels: ChannelCreateManyWithoutUsersInput
@@ -1347,6 +1351,8 @@ enum UserOrderByInput {
   email_DESC
   password_ASC
   password_DESC
+  avatar_ASC
+  avatar_DESC
   resetToken_ASC
   resetToken_DESC
   resetTokenExpiry_ASC
@@ -1358,6 +1364,7 @@ type UserPreviousValues {
   username: String!
   email: String!
   password: String!
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
 }
@@ -1531,6 +1538,46 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   password_not_ends_with: String
+  avatar: String
+
+  """All values that are not equal to given value."""
+  avatar_not: String
+
+  """All values that are contained in given list."""
+  avatar_in: [String!]
+
+  """All values that are not contained in given list."""
+  avatar_not_in: [String!]
+
+  """All values less than the given value."""
+  avatar_lt: String
+
+  """All values less than or equal the given value."""
+  avatar_lte: String
+
+  """All values greater than the given value."""
+  avatar_gt: String
+
+  """All values greater than or equal the given value."""
+  avatar_gte: String
+
+  """All values containing the given string."""
+  avatar_contains: String
+
+  """All values not containing the given string."""
+  avatar_not_contains: String
+
+  """All values starting with the given string."""
+  avatar_starts_with: String
+
+  """All values not starting with the given string."""
+  avatar_not_starts_with: String
+
+  """All values ending with the given string."""
+  avatar_ends_with: String
+
+  """All values not ending with the given string."""
+  avatar_not_ends_with: String
   resetToken: String
 
   """All values that are not equal to given value."""
@@ -1656,6 +1703,7 @@ input UserUpdateDataInput {
   username: String
   email: String
   password: String
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   notifications: NotificationUpdateManyWithoutRecipientInput
@@ -1666,6 +1714,7 @@ input UserUpdateInput {
   username: String
   email: String
   password: String
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   notifications: NotificationUpdateManyWithoutRecipientInput
@@ -1676,6 +1725,7 @@ input UserUpdateManyDataInput {
   username: String
   email: String
   password: String
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
 }
@@ -1684,6 +1734,7 @@ input UserUpdateManyMutationInput {
   username: String
   email: String
   password: String
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
 }
@@ -1723,6 +1774,7 @@ input UserUpdateWithoutChannelsDataInput {
   username: String
   email: String
   password: String
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   notifications: NotificationUpdateManyWithoutRecipientInput
@@ -1732,6 +1784,7 @@ input UserUpdateWithoutNotificationsDataInput {
   username: String
   email: String
   password: String
+  avatar: String
   resetToken: String
   resetTokenExpiry: String
   channels: ChannelUpdateManyWithoutUsersInput
@@ -1927,6 +1980,46 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   password_not_ends_with: String
+  avatar: String
+
+  """All values that are not equal to given value."""
+  avatar_not: String
+
+  """All values that are contained in given list."""
+  avatar_in: [String!]
+
+  """All values that are not contained in given list."""
+  avatar_not_in: [String!]
+
+  """All values less than the given value."""
+  avatar_lt: String
+
+  """All values less than or equal the given value."""
+  avatar_lte: String
+
+  """All values greater than the given value."""
+  avatar_gt: String
+
+  """All values greater than or equal the given value."""
+  avatar_gte: String
+
+  """All values containing the given string."""
+  avatar_contains: String
+
+  """All values not containing the given string."""
+  avatar_not_contains: String
+
+  """All values starting with the given string."""
+  avatar_starts_with: String
+
+  """All values not starting with the given string."""
+  avatar_not_starts_with: String
+
+  """All values ending with the given string."""
+  avatar_ends_with: String
+
+  """All values not ending with the given string."""
+  avatar_not_ends_with: String
   resetToken: String
 
   """All values that are not equal to given value."""
