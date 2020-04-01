@@ -32,7 +32,7 @@ const ChannelBanner = ({ classes, me }) => {
 			>
 				<Grid item>
 					<IconButton>
-						<Avatar alt={username} src="" />
+						<Avatar alt={username} src={me.avatar} />
 					</IconButton>
 				</Grid>
 				<Grid item>

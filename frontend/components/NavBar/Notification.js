@@ -45,7 +45,7 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 		try {
 			AcceptFriendRequest({ variables: { id } });
 		} catch (e) {
-			console.log(e);
+			console.log("Notification", e);
 		}
 	};
 

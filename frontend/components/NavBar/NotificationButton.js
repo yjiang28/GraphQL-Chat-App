@@ -7,6 +7,7 @@ import Notification from "./Notification";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
 import { CHANNEL_QUERY } from "../../gqls/queries/channelQueries";
 import { NOTIFICATION_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
+// import { DualBallLoader } from "../shared/loaders";
 
 const NotificationButton = ({ me }) => {
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -20,7 +21,8 @@ const NotificationButton = ({ me }) => {
 			if (refetch) refetch();
 			if (
 				subscriptionData.data.notification.type ===
-				"FriendRequestAccepted"
+					"FriendRequestAccepted" &&
+				refetchChannels
 			)
 				refetchChannels();
 		}
@@ -36,12 +38,17 @@ const NotificationButton = ({ me }) => {
 	};
 
 	useEffect(() => {
-		if (data && data.me && data.me.notifications.length > 0)
+		if (
+			data &&
+			data.me &&
+			data.me.notifications &&
+			data.me.notifications.length > 0
+		)
 			setNewNotif(true);
 	}, [data]);
 
 	const notifications = () => {
-		if (loading) return <MenuItem>Loading...</MenuItem>;
+		if (loading) return <MenuItem>Loading... </MenuItem>;
 		if (data && data.me && data.me.notifications) {
 			const { notifications } = data.me;
 			if (notifications.length === 0)

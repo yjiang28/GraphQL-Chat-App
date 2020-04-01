@@ -8,6 +8,7 @@ const CHANNEL_QUERY = gql`
 			users {
 				id
 				username
+				avatar
 			}
 		}
 	}

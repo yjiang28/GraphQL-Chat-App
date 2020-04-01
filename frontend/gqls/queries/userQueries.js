@@ -7,6 +7,7 @@ const CURRENT_USER_QUERY = gql`
 			id
 			email
 			username
+			avatar
 		}
 	}
 `;
@@ -17,6 +18,7 @@ const USER_QUERY = gql`
 			id
 			username
 			email
+			avatar
 		}
 	}
 `;
@@ -26,6 +28,7 @@ const SEARCH_USER_QUERY = gql`
 		searchUsers(username: $username) {
 			id
 			username
+			avatar
 		}
 	}
 `;

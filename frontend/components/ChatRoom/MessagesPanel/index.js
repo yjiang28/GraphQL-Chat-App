@@ -5,6 +5,7 @@ import { Paper, Grid, Typography, List, withStyles } from "@material-ui/core";
 import Message from "./Message";
 import MessageBanner from "./MessageBanner";
 import MessageForm from "./MessageForm";
+import { DualBallLoader } from "../../shared/loaders";
 import { CHANNEL_MESSAGES_QUERY } from "../../../gqls/queries/channelQueries";
 import { MESSAGE_SUBSCRIPTION } from "../../../gqls/subscriptions/channelSubscriptions";
 
@@ -55,7 +56,12 @@ const MessagesPanel = ({ classes, me, channelId }) => {
 	}, [data]);
 
 	const messgageItems = () => {
-		if (loading) return <div>Loading...</div>;
+		if (loading)
+			return (
+				<Grid item>
+					<DualBallLoader aria-label="Loading messages" />
+				</Grid>
+			);
 		if (data && data.channelMessages) {
 			const messages = data.channelMessages;
 			return messages.map(msg => (

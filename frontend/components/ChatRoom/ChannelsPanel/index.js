@@ -11,6 +11,7 @@ import {
 import Channel from "./Channel";
 import ChannelBanner from "./ChannelBanner";
 import SearchForm from "./SearchForm";
+import { DualBallLoader } from "../../shared/loaders";
 import { CHANNEL_QUERY } from "../../../gqls/queries/channelQueries";
 
 const styles = theme => ({
@@ -32,7 +33,12 @@ const ChannelPanel = ({ classes, me, channelId }) => {
 	const { data, loading } = useQuery(CHANNEL_QUERY);
 
 	const channelItems = () => {
-		if (loading) return <ListItem>Loading...</ListItem>;
+		if (loading)
+			return (
+				<ListItem>
+					<DualBallLoader aria-label={"Loading channels"} />
+				</ListItem>
+			);
 		if (data && data.channels) {
 			const { channels } = data;
 

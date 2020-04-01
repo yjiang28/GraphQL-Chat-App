@@ -3,6 +3,7 @@ import { useQuery } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
 import { List, ListItem, withStyles } from "@material-ui/core";
 import SearchResult from "./SearchResult";
+import { DualBallLoader } from "../../shared/loaders";
 import {
 	USER_QUERY,
 	SEARCH_USER_QUERY
@@ -24,7 +25,7 @@ const styles = theme => ({
 
 const SearchResultList = ({ classes, username, me }) => {
 	const { data, loading, refetch } = useQuery(SEARCH_USER_QUERY, {
-		variables: { username: username.toLowerCase() }
+		variables: { username }
 	});
 
 	useEffect(() => {
@@ -32,10 +33,15 @@ const SearchResultList = ({ classes, username, me }) => {
 	}, [username]);
 
 	const results = () => {
-		if (loading) return <ListItem>Loading...</ListItem>;
+		if (loading)
+			return (
+				<ListItem>
+					<DualBallLoader aria-label="Loading search results" />
+				</ListItem>
+			);
 		if (data && data.searchUsers && data.searchUsers.length > 0) {
 			return data.searchUsers.map(user => (
-				<SearchResult username={user.username} key={user.id} me={me} />
+				<SearchResult user={user} key={user.id} me={me} />
 			));
 		}
 		return <ListItem>No result found</ListItem>;

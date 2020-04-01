@@ -14,6 +14,7 @@ import {
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import { SEND_FRIEND_REQUEST_MUTATION } from "../../../gqls/mutations/notificationMutations";
 import { NOTIFICATIONS_QUERY } from "../../../gqls/queries/notificationQueries";
+import { processUsername } from "../../../scripts/utils";
 
 const styles = theme => ({
 	small: {
@@ -22,7 +23,9 @@ const styles = theme => ({
 	}
 });
 
-const SearchResult = forwardRef(({ classes, username, me }, ref) => {
+const SearchResult = forwardRef(({ classes, user, me }, ref) => {
+	const { username, avatar } = user;
+
 	const [SendFriendRequest, _] = useMutation(SEND_FRIEND_REQUEST_MUTATION, {
 		refetchQueries: [
 			{
@@ -38,9 +41,9 @@ const SearchResult = forwardRef(({ classes, username, me }, ref) => {
 	return (
 		<ListItem button>
 			<ListItemAvatar>
-				<Avatar alt={username} src="" className={classes.small} />
+				<Avatar alt={username} src={avatar} className={classes.small} />
 			</ListItemAvatar>
-			<ListItemText primary={username} />
+			<ListItemText primary={processUsername(username)} />
 			{username !== me.username && (
 				<ListItemSecondaryAction>
 					<IconButton
@@ -58,7 +61,7 @@ const SearchResult = forwardRef(({ classes, username, me }, ref) => {
 
 SearchResult.propTypes = {
 	me: PropTypes.object.isRequired,
-	username: PropTypes.string.isRequired
+	user: PropTypes.string.isRequired
 };
 
 export default withStyles(styles)(SearchResult);

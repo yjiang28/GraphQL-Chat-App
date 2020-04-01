@@ -19,7 +19,8 @@ import ChannelsPanel from "./ChannelsPanel";
 import MessagesPanel from "./MessagesPanel";
 import {
 	CHANNEL_MESSAGES_QUERY,
-	LATEST_ACTIVE_CHANNEL_QUERY
+	LATEST_ACTIVE_CHANNEL_QUERY,
+	ACTIVE_CHANNEL_QUERY
 } from "../../gqls/queries/channelQueries";
 
 const styles = theme => ({
@@ -33,7 +34,7 @@ const ChatRoom = ({ classes, query, me }) => {
 	const client = useApolloClient();
 	const [messages, setMessages] = useState([]);
 
-	const { data, loading, refetch } = useQuery(LATEST_ACTIVE_CHANNEL_QUERY);
+	const { data } = useQuery(LATEST_ACTIVE_CHANNEL_QUERY);
 
 	useEffect(() => {
 		if (data && data.latestActiveChannel) {
@@ -49,13 +50,15 @@ const ChatRoom = ({ classes, query, me }) => {
 		}
 	}, [data]);
 
-	return me && query && query.channelId ? (
+	const { data: localData } = useQuery(ACTIVE_CHANNEL_QUERY);
+
+	return localData && localData.activeChannel ? (
 		<Grid container spacing={0} classes={{ root: classes.container }}>
 			<Grid item sm={4} md={3}>
-				<ChannelsPanel me={me} channelId={query.channelId} />
+				<ChannelsPanel me={me} channelId={localData.activeChannel.id} />
 			</Grid>
 			<Grid item sm={8} md={9}>
-				<MessagesPanel me={me} channelId={query.channelId} />
+				<MessagesPanel me={me} channelId={localData.activeChannel.id} />
 			</Grid>
 		</Grid>
 	) : null;

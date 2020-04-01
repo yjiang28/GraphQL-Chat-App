@@ -47,9 +47,9 @@ const App = ({ me, pathname, query }) => {
 	return (
 		<ThemeProvider theme={theme}>
 			<NavBar me={me} />
-			{me && pathname && query ? (
+			{me ? (
 				<ChatRoom me={me} query={query} />
-			) : pathname == "/signup" ? (
+			) : pathname.toLowerCase() === "signup" ? (
 				<SignUp />
 			) : (
 				<SignIn />
