@@ -26,17 +26,18 @@ const NavBar = ({ me }) => {
   const client = useApolloClient();
 
   const [SignOut, _] = useMutation(SIGN_OUT_MUTATION, {
-    refetchQueries: [{ query: CURRENT_USER_QUERY }]
-  });
-
-  const logout = async () => {
-    try {
-      await SignOut();
+    refetchQueries: [{ query: CURRENT_USER_QUERY }],
+    onCompleted: data => {
       Router.push("/signin");
       client.resetStore();
-    } catch (e) {
-      console.log("NavBar", e);
+    },
+    onError: e => {
+      console.log("NavBar: SIGN_OUT_MUTATION:", e);
     }
+  });
+
+  const logout = () => {
+    SignOut();
   };
 
   const login = () => {

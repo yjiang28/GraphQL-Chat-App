@@ -27,15 +27,14 @@ const SearchResult = forwardRef(({ classes, user, me }, ref) => {
 	const { username, avatar } = user;
 
 	const [SendFriendRequest, _] = useMutation(SEND_FRIEND_REQUEST_MUTATION, {
-		refetchQueries: [
-			{
-				query: NOTIFICATIONS_QUERY
-			}
-		]
+		refetchQueries: [{ query: NOTIFICATIONS_QUERY }],
+		onError: e => {
+			console.log("SearchResult: SEND_FRIEND_REQUEST_MUTATION", e);
+		}
 	});
 
-	const sendFriendRequest = async () => {
-		const data = await SendFriendRequest({ variables: { username } });
+	const sendFriendRequest = () => {
+		SendFriendRequest({ variables: { username } });
 	};
 
 	return (

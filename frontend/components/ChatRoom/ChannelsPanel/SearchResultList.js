@@ -24,8 +24,11 @@ const styles = theme => ({
 });
 
 const SearchResultList = ({ classes, username, me }) => {
-	const { data, loading, refetch } = useQuery(SEARCH_USER_QUERY, {
-		variables: { username }
+	const { data, loading, refetch, error } = useQuery(SEARCH_USER_QUERY, {
+		variables: { username },
+		onError: e => {
+			console.log("SearchResultList: SEARCH_USER_QUERY:", e);
+		}
 	});
 
 	useEffect(() => {

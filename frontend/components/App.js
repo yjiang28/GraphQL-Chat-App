@@ -49,7 +49,7 @@ const App = ({ me, pathname, query }) => {
 			<NavBar me={me} />
 			{me ? (
 				<ChatRoom me={me} query={query} />
-			) : pathname.toLowerCase() === "signup" ? (
+			) : pathname.toLowerCase() === "/signup" ? (
 				<SignUp />
 			) : (
 				<SignIn />

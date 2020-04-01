@@ -47,38 +47,44 @@ const SignUp = ({ classes }) => {
   });
 
   const [SignUp, { data }] = useMutation(SIGN_UP_MUTATION, {
-    refetchQueries: [{ query: CURRENT_USER_QUERY }]
-  });
-
-  const onSubmit = async e => {
-    e.preventDefault();
-    setUserInputError({
-      username: false,
-      email: false
-    });
-
-    const formData = new FormData(e.target),
-      username = formData.get("username"),
-      email = formData.get("email"),
-      password = formData.get("password");
-
-    try {
-      await SignUp({
-        variables: { username, email, password }
-      });
-      Router.push("/chatroom");
-    } catch (e) {
+    refetchQueries: [{ query: CURRENT_USER_QUERY }],
+    onCompleted: data => {
+      Router.push("/");
+    },
+    onError: e => {
+      console.log("SignUp: SIGN_UP_MUTATION:", e);
       const { graphQLErrors } = e;
 
       if (graphQLErrors) {
         let updatedError = { ...userInputError };
-        if (graphQLErrors[0] && graphQLErrors[0].extensions)
+        if (
+          graphQLErrors[0] &&
+          graphQLErrors[0].extensions &&
+          graphQLErrors[0].extensions.invalidArgs
+        )
           graphQLErrors[0].extensions.invalidArgs.forEach(arg => {
             updatedError[arg] = true;
           });
         setUserInputError(updatedError);
       }
     }
+  });
+
+  const onSubmit = e => {
+    e.preventDefault();
+    setUserInputError({
+      username: false,
+      email: false
+    });
+
+    const formData = new FormData(e.target);
+    const username = formData.get("username");
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    SignUp({
+      variables: { username, email, password }
+    });
   };
 
   return (
@@ -89,7 +95,7 @@ const SignUp = ({ classes }) => {
           Sign Up
         </Typography>
         <form className={classes.form} onSubmit={onSubmit}>
-          <Grid container spacing={0}>
+          <Grid container spacing={2}>
             <TextInputField
               name="username"
               label="Username"

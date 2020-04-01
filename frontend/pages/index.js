@@ -6,7 +6,10 @@ const home = props => {
 	const { data, error, loading, pathname, query = {} } = props;
 
 	if (loading) return <div>loading</div>;
-	if (error) return <Error statusCode={404} />;
+	if (error) {
+		console.log("/ page", error);
+		return <Error statusCode={404} />;
+	}
 	if (data) {
 		return <App pathname={pathname} me={data.me} query={query} />;
 	}

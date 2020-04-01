@@ -47,33 +47,38 @@ const SignIn = ({ classes }) => {
   });
 
   const [SignIn, _] = useMutation(SIGN_IN_MUTATION, {
-    refetchQueries: [{ query: CURRENT_USER_QUERY }]
-  });
-
-  const onSubmit = async e => {
-    e.preventDefault();
-    if (userInputError) setUserInputError({ email: false, password: false });
-    const formData = new FormData(e.target),
-      email = formData.get("email"),
-      password = formData.get("password");
-
-    try {
-      await SignIn({
-        variables: { email, password }
-      });
-      Router.push("/chatroom");
-    } catch (e) {
+    refetchQueries: [{ query: CURRENT_USER_QUERY }],
+    onCompleted: data => {
+      Router.push("/");
+    },
+    onError: e => {
+      console.log("SignIn: SIGN_IN_MUTATION:", e);
       const { graphQLErrors } = e;
-
       if (graphQLErrors) {
         let updatedError = { ...userInputError };
-        if (graphQLErrors[0] && graphQLErrors[0].extensions)
+        if (
+          graphQLErrors[0] &&
+          graphQLErrors[0].extensions &&
+          graphQLErrors[0].extensions.invalidArgs
+        )
           graphQLErrors[0].extensions.invalidArgs.forEach(arg => {
             updatedError[arg] = true;
           });
         setUserInputError(updatedError);
       }
     }
+  });
+
+  const onSubmit = e => {
+    e.preventDefault();
+    if (userInputError) setUserInputError({ email: false, password: false });
+    const formData = new FormData(e.target);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    SignIn({
+      variables: { email, password }
+    });
   };
 
   return (
@@ -84,7 +89,7 @@ const SignIn = ({ classes }) => {
           Sign In
         </Typography>
         <form className={classes.form} onSubmit={onSubmit}>
-          <Grid container spacing={0}>
+          <Grid container spacing={2}>
             <TextInputField
               name="email"
               label="Email Address"

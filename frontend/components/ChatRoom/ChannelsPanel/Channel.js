@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import PropTypes from "prop-types";
-import { useMutation, useQuery, useApolloClient } from "@apollo/react-hooks";
+import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import Router from "next/router";
 import {
 	ListItem,
@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import { processUsername } from "../../../scripts/utils";
+import { LATEST_CHANNEL_MESSAGE_QUERY } from "../../../gqls/queries/channelQueries";
 
 const styles = theme => ({
 	listItem: {
@@ -31,10 +32,17 @@ const styles = theme => ({
 
 const Channel = ({ classes, me, user, channel, active }) => {
 	const client = useApolloClient();
+	const [anchorEl, setAnchorEl] = useState(null);
+
 	const { username } = user;
 	const { id: channelId } = channel;
 
-	const [anchorEl, setAnchorEl] = useState(null);
+	const { data, loading } = useQuery(LATEST_CHANNEL_MESSAGE_QUERY, {
+		variables: { channelId },
+		onError: e => {
+			console.log("Channel: LATEST_CHANNEL_MESSAGE_QUERY: ", e);
+		}
+	});
 
 	const handleClick = () => {
 		Router.push({
@@ -44,7 +52,7 @@ const Channel = ({ classes, me, user, channel, active }) => {
 		client.writeData({ data: { activeChannel: channel } });
 	};
 
-	const deleteContact = () => {};
+	const deleteChannel = () => {};
 
 	return (
 		<Fragment>
@@ -62,7 +70,7 @@ const Channel = ({ classes, me, user, channel, active }) => {
 								? "Just You"
 								: processUsername(username)
 						}
-						src="/static/images/avatar/1.jpg"
+						src={user.avatar}
 					/>
 				</ListItemAvatar>
 				<ListItemText
@@ -71,8 +79,8 @@ const Channel = ({ classes, me, user, channel, active }) => {
 							? "Just You"
 							: processUsername(username)
 					}
+					secondary={data ? data.latestChannelMessage.content : ""}
 					classes={{ root: classes.username }}
-					disableTypography
 				/>
 				<ListItemSecondaryAction>
 					<IconButton
@@ -88,13 +96,14 @@ const Channel = ({ classes, me, user, channel, active }) => {
 			</ListItem>
 			<Menu
 				anchorEl={anchorEl}
+				getContentAnchorEl={null}
 				anchorOrigin={{
 					vertical: "center",
 					horizontal: "right"
 				}}
 				keepMounted
 				transformOrigin={{
-					vertical: "top",
+					vertical: "center",
 					horizontal: "left"
 				}}
 				open={Boolean(anchorEl)}
@@ -102,15 +111,17 @@ const Channel = ({ classes, me, user, channel, active }) => {
 					setAnchorEl(null);
 				}}
 			>
-				<MenuItem onClick={deleteContact}>Delete</MenuItem>
+				<MenuItem onClick={deleteChannel}>Delete</MenuItem>
 			</Menu>
 		</Fragment>
 	);
 };
 
 Channel.propTypes = {
+	me: PropTypes.object.isRequired,
 	user: PropTypes.object.isRequired,
-	channel: PropTypes.object.isRequired
+	channel: PropTypes.object.isRequired,
+	active: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles)(Channel);

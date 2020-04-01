@@ -30,22 +30,28 @@ const scrollToBottom = messagesEndRef => {
 };
 
 const MessagesPanel = ({ classes, me, channelId }) => {
-	const { data, loading, refetch } = useQuery(CHANNEL_MESSAGES_QUERY, {
-		variables: { channelId }
-	});
 	const messagesEndRef = useRef();
 
-	const { error } = useSubscription(MESSAGE_SUBSCRIPTION, {
+	const { data, loading, refetch } = useQuery(CHANNEL_MESSAGES_QUERY, {
+		variables: { channelId },
+		onError: e => {
+			console.log("MessagesPanel: CHANNEL_MESSAGES_QUERY:", e);
+		}
+	});
+
+	useSubscription(MESSAGE_SUBSCRIPTION, {
 		variables: { userId: me.id },
 		onSubscriptionData: ({ subscriptionData }) => {
 			const { message } = subscriptionData.data;
-			const { id, content, channel, sender } = message;
+			const { channel } = message;
 			if (channel.id == channelId && refetch) {
 				refetch();
 			}
+		},
+		onError: e => {
+			console.log("MessagesPanel: MESSAGE_SUBSCRIPTION:", e);
 		}
 	});
-	if (error) console.log(error);
 
 	useEffect(() => {
 		if (channelId && refetch) refetch();

@@ -42,20 +42,20 @@ const styles = theme => ({
 });
 
 const MessageForm = ({ classes, channelId }) => {
-  const [SendMessage, _] = useMutation(SEND_MESSAGE_MUTATION);
+  const [SendMessage, _] = useMutation(SEND_MESSAGE_MUTATION, {
+    onError: e => {
+      console.log("MessageForm : SEND_MESSAGE_MUTATION:", e);
+    }
+  });
 
   const sendMessage = async e => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const message = formData.get("message");
     e.target.reset();
-    try {
-      await SendMessage({
-        variables: { channelId, message }
-      });
-    } catch (e) {
-      console.log("MessageForm", e);
-    }
+    SendMessage({
+      variables: { channelId, message }
+    });
   };
 
   return (

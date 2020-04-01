@@ -49,7 +49,6 @@ const styles = theme => ({
 const SearchForm = ({ classes, me }) => {
   const [focused, setFocused] = useState(false);
   const [username, setUsername] = useState("");
-  const ref = useRef();
 
   const handleChange = e => {
     setUsername(e.currentTarget.value);
@@ -61,7 +60,6 @@ const SearchForm = ({ classes, me }) => {
         position="relative"
         color="inherit"
         classes={{ root: classes.appBar }}
-        ref={ref}
       >
         <Toolbar classes={{ root: classes.toolBar }}>
           <div className={classes.search}>

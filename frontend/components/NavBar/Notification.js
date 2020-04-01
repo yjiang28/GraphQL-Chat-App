@@ -31,22 +31,17 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 		ACCEPT_FRIEND_REQUEST_MUTATION,
 		{
 			refetchQueries: [
-				{
-					query: NOTIFICATIONS_QUERY
-				},
-				{
-					query: CHANNEL_QUERY
-				}
-			]
+				{ query: NOTIFICATIONS_QUERY },
+				{ query: CHANNEL_QUERY }
+			],
+			onError: e => {
+				console.log("Notification: ACCEPT_FRIEND_REQUEST_MUTATION:", e);
+			}
 		}
 	);
 
 	const acceptFriendRequest = () => {
-		try {
-			AcceptFriendRequest({ variables: { id } });
-		} catch (e) {
-			console.log("Notification", e);
-		}
+		AcceptFriendRequest({ variables: { id } });
 	};
 
 	return (

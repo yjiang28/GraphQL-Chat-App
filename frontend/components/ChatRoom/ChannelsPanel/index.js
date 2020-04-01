@@ -30,7 +30,11 @@ const styles = theme => ({
 });
 
 const ChannelPanel = ({ classes, me, channelId }) => {
-	const { data, loading } = useQuery(CHANNEL_QUERY);
+	const { data, loading, error } = useQuery(CHANNEL_QUERY, {
+		onError: e => {
+			console.log("ChannelPanel: CHANNEL_QUERY", e);
+		}
+	});
 
 	const channelItems = () => {
 		if (loading)
@@ -66,7 +70,7 @@ const ChannelPanel = ({ classes, me, channelId }) => {
 				);
 			});
 		}
-		return <ListItem>Error: loading channels</ListItem>;
+		if (error) return <ListItem>Error: loading channels</ListItem>;
 	};
 
 	return (

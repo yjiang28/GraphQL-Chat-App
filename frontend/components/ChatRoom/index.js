@@ -34,7 +34,11 @@ const ChatRoom = ({ classes, query, me }) => {
 	const client = useApolloClient();
 	const [messages, setMessages] = useState([]);
 
-	const { data } = useQuery(LATEST_ACTIVE_CHANNEL_QUERY);
+	const { data } = useQuery(LATEST_ACTIVE_CHANNEL_QUERY, {
+		onError: e => {
+			console.log("ChatRoom: LATEST_ACTIVE_CHANNEL_QUERY:", e);
+		}
+	});
 
 	useEffect(() => {
 		if (data && data.latestActiveChannel) {
@@ -50,7 +54,11 @@ const ChatRoom = ({ classes, query, me }) => {
 		}
 	}, [data]);
 
-	const { data: localData } = useQuery(ACTIVE_CHANNEL_QUERY);
+	const { data: localData } = useQuery(ACTIVE_CHANNEL_QUERY, {
+		onError: e => {
+			console.log("MessagesPanel: ACTIVE_CHANNEL_QUERY:", e);
+		}
+	});
 
 	return localData && localData.activeChannel ? (
 		<Grid container spacing={0} classes={{ root: classes.container }}>

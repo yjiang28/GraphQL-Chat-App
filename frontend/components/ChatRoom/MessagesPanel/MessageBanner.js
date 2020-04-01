@@ -29,8 +29,12 @@ const styles = theme => ({
 });
 
 const MessageBanner = ({ classes, me }) => {
-	const { data, error, loading } = useQuery(ACTIVE_CHANNEL_QUERY);
-	const [recipient, setRecipient] = useState(null);
+	const [recipient, setRecipient] = useState("");
+	const { data } = useQuery(ACTIVE_CHANNEL_QUERY, {
+		onError: e => {
+			console.log("MessageBanner: ACTIVE_CHANNEL_QUERY:", e);
+		}
+	});
 
 	useEffect(() => {
 		if (data && data.activeChannel) {

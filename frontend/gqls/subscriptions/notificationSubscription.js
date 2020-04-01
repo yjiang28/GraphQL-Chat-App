@@ -4,8 +4,6 @@ const NOTIFICATION_SUBSCRIPTION = gql`
 	subscription Notification($userId: ID!) {
 		notification(userId: $userId) {
 			id
-			type
-			content
 		}
 	}
 `;

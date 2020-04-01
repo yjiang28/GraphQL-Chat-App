@@ -12,8 +12,21 @@ import { NOTIFICATION_SUBSCRIPTION } from "../../gqls/subscriptions/notification
 const NotificationButton = ({ me }) => {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [newNotif, setNewNotif] = useState(false);
-	const { data, loading, refetch } = useQuery(NOTIFICATIONS_QUERY);
-	const { refetch: refetchChannels } = useQuery(CHANNEL_QUERY);
+
+	const { data, loading, refetch } = useQuery(NOTIFICATIONS_QUERY, {
+		onError: e => {
+			console.log("NotificationButton: NOTIFICATIONS_QUERY:", e);
+		}
+	});
+
+	const { refetch: refetchChannels, error: channelsQueryError } = useQuery(
+		CHANNEL_QUERY,
+		{
+			onError: e => {
+				console.log("NotificationButton: CHANNEL_QUERY:", e);
+			}
+		}
+	);
 
 	useSubscription(NOTIFICATION_SUBSCRIPTION, {
 		variables: { userId: me.id },
@@ -25,6 +38,9 @@ const NotificationButton = ({ me }) => {
 				refetchChannels
 			)
 				refetchChannels();
+		},
+		onError: e => {
+			console.log("NotificationButton: NOTIFICATION_SUBSCRIPTION:", e);
 		}
 	});
 

@@ -5,7 +5,8 @@ import KeyboardIcon from "@material-ui/icons/Keyboard";
 import SendIcon from "@material-ui/icons/Send";
 
 const styles = theme => ({
-  paper: {
+  admin: {},
+  message: {
     backgroundColor: theme.palette.grey[200],
     borderRadius: theme.shape.borderRadius,
     padding: theme.spacing(1, 2),
@@ -17,19 +18,33 @@ const styles = theme => ({
   }
 });
 
+const admin = "administrator";
+
 const Message = ({ classes, message, me }) => {
-  const { id } = me;
-  const fromMe = message.sender.id == id;
+  const { username } = me;
+
+  const sender =
+    message.sender.username === admin
+      ? admin
+      : message.sender.username === username
+      ? username
+      : message.sender.username;
 
   return (
     <Grid item>
       <Grid
         container
         alignItems="flex-start"
-        justify={fromMe ? "flex-end" : "flex-start"}
+        justify={
+          sender === admin
+            ? "center"
+            : sender === username
+            ? "flex-end"
+            : "flex-start"
+        }
       >
         <Grid item>
-          <div className={classes.paper}>
+          <div className={sender === admin ? classes.admin : classes.message}>
             <Typography display="inline">{message.content}</Typography>
           </div>
         </Grid>
