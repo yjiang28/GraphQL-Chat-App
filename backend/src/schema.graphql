@@ -4,8 +4,8 @@ type SuccessMessage {
 }
 
 type Mutation {
-	signUp(email: String!, password: String!, username: String!): User
-	signIn(email: String!, password: String!): User
+	signUp(email: String!, password: String!, username: String!): SuccessMessage
+	signIn(email: String!, password: String!): SuccessMessage
 	signOut: SuccessMessage!
 	sendFriendRequest(username: String!): Notification!
 	acceptFriendRequest(id: ID!): Channel!

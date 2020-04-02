@@ -3,24 +3,27 @@ import gql from "graphql-tag";
 
 const CHANNEL_QUERY = gql`
 	{
-		channels {
+		me {
 			id
-			users {
+			channels {
 				id
-				username
-				avatar
-			}
-			messages {
-				id
-				sender {
+				users {
 					id
 					username
+					avatar
 				}
-				recipient {
+				messages(orderBy: createdAt_ASC, last: 20) {
 					id
-					username
+					sender {
+						id
+						username
+					}
+					recipient {
+						id
+						username
+					}
+					content
 				}
-				content
 			}
 		}
 	}
@@ -108,5 +111,5 @@ export {
 	LATEST_CHANNEL_MESSAGE_QUERY,
 	ACTIVE_CHANNEL_QUERY,
 	CHANNEL_MESSAGES_QUERY,
-	LATEST_ACTIVE_CHANNEL_QUERY
+	LATEST_ACTIVE_CHANNEL_QUERY,
 };

@@ -9,7 +9,7 @@ import { notificationTypes, messageType } from "./Subscription";
 const admin = "administrator";
 const { friendRequest, friendRequestAccepted } = notificationTypes;
 
-const processUsername = username => {
+const processUsername = (username) => {
 	const res = username
 		.toLowerCase()
 		.split(" ")
@@ -36,7 +36,7 @@ const Mutation = {
 			invalidArgs.push("email");
 		if (invalidArgs.length > 0)
 			throw new UserInputError("Duplicate registration info", {
-				invalidArgs
+				invalidArgs,
 			});
 
 		const avatar = faker.image.avatar();
@@ -48,10 +48,10 @@ const Mutation = {
 					password,
 					avatar,
 					notifications: [],
-					channels: []
-				}
+					channels: [],
+				},
 			},
-			info
+			{ id }
 		);
 
 		const channel = ctx.db.mutation.createChannel({
@@ -62,11 +62,11 @@ const Mutation = {
 						{
 							sender: { connect: { username: admin } },
 							recipient: { connect: { username } },
-							content: "This is your space."
-						}
-					]
-				}
-			}
+							content: "This is your space.",
+						},
+					],
+				},
+			},
 		});
 
 		// create the JSW token
@@ -74,33 +74,39 @@ const Mutation = {
 		// set the JWT as a cookie on the response
 		await ctx.res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 30 // 1 month
+			maxAge: 1000 * 60 * 60 * 24 * 30, // 1 month
 		});
 
-		return user;
+		return { message: "Successfully signed up!" };
 	},
 	async signIn(parent, args, ctx, info) {
 		const email = args.email.toLowerCase();
 		const password = args.password;
-		const user = await ctx.db.query.user({ where: { email } }, info);
+		const user = await ctx.db.query.user(
+			{ where: { email } },
+			"{id password}"
+		);
+
 		if (!user)
 			throw new UserInputError("No such email registered", {
-				invalidArgs: ["email"]
+				invalidArgs: ["email"],
 			});
+
 		const valid = await bcrypt.compare(password, user.password);
 		if (!valid)
 			throw new UserInputError("Incorrect Password", {
-				invalidArgs: ["password"]
+				invalidArgs: ["password"],
 			});
+
 		// create the JSW token
 		const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// set the JWT as a cookie on the response
 		await ctx.res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 30 // 1 month
+			maxAge: 1000 * 60 * 60 * 24 * 30, // 1 month
 		});
 
-		return user;
+		return { message: "Successfully signed in!" };
 	},
 	async signOut(parent, args, ctx, info) {
 		await ctx.res.clearCookie("token");
@@ -123,20 +129,20 @@ const Mutation = {
 			{
 				data: {
 					sender: {
-						connect: { username: senderUsername }
+						connect: { username: senderUsername },
 					},
 					recipient: {
-						connect: { username: recipientUsername.toLowerCase() }
+						connect: { username: recipientUsername.toLowerCase() },
 					},
 					type: friendRequest,
-					content: `User ${senderUsername} sent you a friend request!`
-				}
+					content: `User ${senderUsername} sent you a friend request!`,
+				},
 			},
 			info
 		);
 
 		pubsub.publish(friendRequest, {
-			notification
+			notification,
 		});
 
 		return notification;
@@ -158,16 +164,16 @@ const Mutation = {
 			{
 				data: {
 					sender: {
-						connect: { id: sender.id }
+						connect: { id: sender.id },
 					},
 					recipient: {
-						connect: { id: recipient.id }
+						connect: { id: recipient.id },
 					},
 					type: friendRequestAccepted,
 					content: `You became friends with ${processUsername(
 						sender.username
-					)}.`
-				}
+					)}.`,
+				},
 			},
 			"{id type content sender{id username} recipient{id username}}"
 		);
@@ -176,37 +182,37 @@ const Mutation = {
 			{
 				data: {
 					sender: {
-						connect: { id: recipient.id }
+						connect: { id: recipient.id },
 					},
 					recipient: {
-						connect: { id: sender.id }
+						connect: { id: sender.id },
 					},
 					type: friendRequestAccepted,
 					content: `You became friends with ${processUsername(
 						recipient.username
-					)}.`
-				}
+					)}.`,
+				},
 			},
 			"{id type content sender{id username} recipient{id username}}"
 		);
 
 		await ctx.db.mutation.deleteNotification({
-			where: { id }
+			where: { id },
 		});
 
 		pubsub.publish(friendRequestAccepted, {
-			notification: notificationToRecipient
+			notification: notificationToRecipient,
 		});
 
 		pubsub.publish(friendRequestAccepted, {
-			notification: notificationToSender
+			notification: notificationToSender,
 		});
 
 		const channel = await ctx.db.mutation.createChannel(
 			{
 				data: {
 					users: {
-						connect: [{ id: recipient.id }, { id: sender.id }]
+						connect: [{ id: recipient.id }, { id: sender.id }],
 					},
 					messages: {
 						create: [
@@ -214,11 +220,11 @@ const Mutation = {
 								sender: { connect: { username: admin } },
 								recipient: { connect: { id: recipient.id } },
 								content:
-									"This is the beginning of your conversation."
-							}
-						]
-					}
-				}
+									"This is the beginning of your conversation.",
+							},
+						],
+					},
+				},
 			},
 			info
 		);
@@ -251,14 +257,14 @@ const Mutation = {
 					recipient: { connect: { id: recipientId } },
 					sender: { connect: { id: senderId } },
 					content: message,
-					channel: { connect: { id: channelId } }
-				}
+					channel: { connect: { id: channelId } },
+				},
 			},
 			info
 		);
 		pubsub.publish(messageType, { message: newMessage });
 		return newMessage;
-	}
+	},
 };
 
 export default Mutation;

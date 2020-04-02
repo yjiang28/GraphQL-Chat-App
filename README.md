@@ -1,6 +1,6 @@
 ## A full stack chatting app
 
-Frontend: Next.js, React, Apollo Client, Material-UI  
+Frontend: Next.js, React, Apollo Client, Apollo Cache, Material-UI  
 Backend: Node.js, Apollo Server, Prisma db
 
 Features:

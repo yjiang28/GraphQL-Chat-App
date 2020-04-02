@@ -9,49 +9,49 @@ import {
   Grid,
   Typography,
   Container,
-  withStyles
+  withStyles,
 } from "@material-ui/core";
 import TextInputField from "./shared/TextInputField";
 import { CURRENT_USER_QUERY } from "../gqls/queries/userQueries";
 import { SIGN_IN_MUTATION } from "../gqls/mutations/userMutations";
 
-const styles = theme => ({
+const styles = (theme) => ({
   "@global": {
     body: {
-      backgroundColor: theme.palette.common.white
-    }
+      backgroundColor: theme.palette.common.white,
+    },
   },
   paper: {
     marginTop: theme.spacing(8),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main
+    backgroundColor: theme.palette.secondary.main,
   },
   form: {
     width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2)
-  }
+    margin: theme.spacing(3, 0, 2),
+  },
 });
 
 const SignIn = ({ classes }) => {
   const [userInputError, setUserInputError] = useState({
     email: false,
-    password: false
+    password: false,
   });
 
   const [SignIn, _] = useMutation(SIGN_IN_MUTATION, {
     refetchQueries: [{ query: CURRENT_USER_QUERY }],
-    onCompleted: data => {
+    onCompleted: (data) => {
       Router.push("/");
     },
-    onError: e => {
+    onError: (e) => {
       console.log("SignIn: SIGN_IN_MUTATION:", e);
       const { graphQLErrors } = e;
       if (graphQLErrors) {
@@ -61,15 +61,15 @@ const SignIn = ({ classes }) => {
           graphQLErrors[0].extensions &&
           graphQLErrors[0].extensions.invalidArgs
         )
-          graphQLErrors[0].extensions.invalidArgs.forEach(arg => {
+          graphQLErrors[0].extensions.invalidArgs.forEach((arg) => {
             updatedError[arg] = true;
           });
         setUserInputError(updatedError);
       }
-    }
+    },
   });
 
-  const onSubmit = e => {
+  const onSubmit = (e) => {
     e.preventDefault();
     if (userInputError) setUserInputError({ email: false, password: false });
     const formData = new FormData(e.target);
@@ -77,7 +77,7 @@ const SignIn = ({ classes }) => {
     const password = formData.get("password");
 
     SignIn({
-      variables: { email, password: String(password) }
+      variables: { email, password },
     });
   };
 

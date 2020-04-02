@@ -1,5 +1,6 @@
 {
-    "name": "chatting-app",
+    "name": "chatting-app-frontend",
+    "description": "chatting-app-frontend",
     "version": "0.1.0",
     "scripts": {
         "dev": "next dev",
@@ -36,5 +37,7 @@
         "subscriptions-transport-ws": "^0.9.16",
         "websocket": "^1.0.31",
         "ws": "^7.2.1"
-    }
+    },
+    "license": "MIT",
+    "author": "LillyJ <lillyj970920@gmail.com>"
 }

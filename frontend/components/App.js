@@ -4,36 +4,36 @@ import { useApolloClient } from "@apollo/react-hooks";
 import {
 	makeStyles,
 	ThemeProvider,
-	createMuiTheme
+	createMuiTheme,
 } from "@material-ui/core/styles";
 import NavBar from "./NavBar";
 import ChatRoom from "./ChatRoom";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
 	"@global": {
 		body: {
 			width: "100vw",
 			height: "100vh",
-			margin: 0
+			margin: 0,
 		},
 		"*": {
-			boxSizing: "border-box"
-		}
-	}
+			boxSizing: "border-box",
+		},
+	},
 }));
 
 const theme = createMuiTheme({
 	navHeight: 64,
 	palette: {
 		primary: {
-			main: "#222"
-		}
+			main: "#222",
+		},
 	},
 	typography: {
-		fontFamily: '"Lato", "Roboto", "Helvetica", "Arial", sans-serif'
-	}
+		fontFamily: '"Lato", "Roboto", "Helvetica", "Arial", sans-serif',
+	},
 });
 
 const App = ({ me, pathname, query }) => {
@@ -61,7 +61,7 @@ const App = ({ me, pathname, query }) => {
 App.propTypes = {
 	me: PropTypes.object,
 	pathname: PropTypes.string.isRequired,
-	query: PropTypes.object.isRequired
+	query: PropTypes.object.isRequired,
 };
 
 export default App;

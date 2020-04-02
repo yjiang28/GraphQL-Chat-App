@@ -8,14 +8,17 @@ import {
 	Grid,
 	Typography,
 	List,
-	withStyles
+	Menu,
+	MenuItem,
+	withStyles,
 } from "@material-ui/core";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import Message from "./Message";
 import MessageForm from "./MessageForm";
 import { ACTIVE_CHANNEL_QUERY } from "../../../gqls/queries/channelQueries";
 import { processUsername } from "../../../scripts/utils";
 
-const styles = theme => ({
+const styles = (theme) => ({
 	container: {
 		position: "relative",
 		height: theme.navHeight,
@@ -24,12 +27,13 @@ const styles = theme => ({
 		borderRight: "none",
 		display: "flex",
 		justifyContent: "flex-start",
-		alignItems: "center"
-	}
+		alignItems: "center",
+	},
 });
 
 const MessageBanner = ({ classes, me, channel }) => {
 	const [recipient, setRecipient] = useState(null);
+	const [anchorEl, setAnchorEl] = useState(null);
 
 	useEffect(() => {
 		if (channel) {
@@ -47,21 +51,60 @@ const MessageBanner = ({ classes, me, channel }) => {
 			<Grid
 				container
 				spacing={2}
-				justify="flex-start"
+				justify="space-between"
 				alignItems="center"
 			>
 				<Grid item>
-					<IconButton>
-						<Avatar
-							alt={processUsername(recipient.username)}
-							src={recipient.avatar}
-						/>
-					</IconButton>
+					<Grid
+						container
+						spacing={2}
+						justify="flex-start"
+						alignItems="center"
+					>
+						<Grid item>
+							<IconButton>
+								<Avatar
+									alt={processUsername(recipient.username)}
+									src={recipient.avatar}
+								/>
+							</IconButton>
+						</Grid>
+						<Grid item>
+							<Typography>
+								{processUsername(recipient.username)}
+							</Typography>
+						</Grid>
+					</Grid>
 				</Grid>
 				<Grid item>
-					<Typography>
-						{processUsername(recipient.username)}
-					</Typography>
+					<IconButton
+						edge="end"
+						aria-label="delete"
+						onClick={(e) => {
+							setAnchorEl(e.currentTarget);
+						}}
+					>
+						<MoreHorizIcon />
+					</IconButton>
+					<Menu
+						anchorEl={anchorEl}
+						getContentAnchorEl={null}
+						anchorOrigin={{
+							vertical: "bottom",
+							horizontal: "right",
+						}}
+						keepMounted
+						transformOrigin={{
+							vertical: "top",
+							horizontal: "right",
+						}}
+						open={Boolean(anchorEl)}
+						onClose={() => {
+							setAnchorEl(null);
+						}}
+					>
+						<MenuItem>Delete</MenuItem>
+					</Menu>
 				</Grid>
 			</Grid>
 		</Paper>
@@ -70,7 +113,7 @@ const MessageBanner = ({ classes, me, channel }) => {
 
 MessageBanner.propTypes = {
 	me: PropTypes.object.isRequired,
-	channel: PropTypes.object.isRequired
+	channel: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(MessageBanner);

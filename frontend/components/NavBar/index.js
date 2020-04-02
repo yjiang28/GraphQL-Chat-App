@@ -7,17 +7,17 @@ import {
   Button,
   Toolbar,
   Typography,
-  makeStyles
+  makeStyles,
 } from "@material-ui/core";
 import ProfileButton from "./ProfileButton";
 import NotificationButton from "./NotificationButton";
 import { CURRENT_USER_QUERY } from "../../gqls/queries/userQueries";
 import { SIGN_OUT_MUTATION } from "../../gqls/mutations/userMutations";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   title: {
-    flexGrow: 1
-  }
+    flexGrow: 1,
+  },
 }));
 
 const NavBar = ({ me }) => {
@@ -27,16 +27,16 @@ const NavBar = ({ me }) => {
 
   const [SignOut, _] = useMutation(SIGN_OUT_MUTATION, {
     refetchQueries: [{ query: CURRENT_USER_QUERY }],
-    onCompleted: data => {
-      client.resetStore();
-      Router.push("/signin");
+    onCompleted: (data) => {
+      Router.push("/");
     },
-    onError: e => {
+    onError: (e) => {
       console.log("NavBar: SIGN_OUT_MUTATION:", e);
-    }
+    },
   });
 
   const logout = () => {
+    client.clearStore();
     SignOut();
   };
 
@@ -65,7 +65,7 @@ const NavBar = ({ me }) => {
 };
 
 NavBar.propTypes = {
-  me: PropTypes.object
+  me: PropTypes.object,
 };
 
 export default NavBar;
