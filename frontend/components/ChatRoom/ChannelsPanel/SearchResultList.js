@@ -6,29 +6,29 @@ import SearchResult from "./SearchResult";
 import { DualBallLoader } from "../../shared/loaders";
 import {
 	USER_QUERY,
-	SEARCH_USER_QUERY
+	SEARCH_USER_QUERY,
 } from "../../../gqls/queries/userQueries";
 
-const styles = theme => ({
+const styles = (theme) => ({
 	root: {
 		position: "absolute",
-		top: theme.spacing(17),
+		top: theme.spacing(15),
 		bottom: 0,
 		left: 0,
 		right: 0,
 		width: "calc(100% - 2px)",
 		zIndex: 1000,
 		padding: theme.spacing(1, 2),
-		background: "white"
-	}
+		background: "white",
+	},
 });
 
 const SearchResultList = ({ classes, username, me }) => {
 	const { data, loading, refetch, error } = useQuery(SEARCH_USER_QUERY, {
 		variables: { username },
-		onError: e => {
+		onError: (e) => {
 			console.log("SearchResultList: SEARCH_USER_QUERY:", e);
-		}
+		},
 	});
 
 	useEffect(() => {
@@ -43,7 +43,7 @@ const SearchResultList = ({ classes, username, me }) => {
 				</ListItem>
 			);
 		if (data && data.searchUsers && data.searchUsers.length > 0) {
-			return data.searchUsers.map(user => (
+			return data.searchUsers.map((user) => (
 				<SearchResult user={user} key={user.id} me={me} />
 			));
 		}
@@ -59,7 +59,7 @@ const SearchResultList = ({ classes, username, me }) => {
 
 SearchResultList.propTypes = {
 	me: PropTypes.object.isRequired,
-	username: PropTypes.string.isRequired
+	username: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(SearchResultList);

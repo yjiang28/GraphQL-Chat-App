@@ -36,6 +36,7 @@ const theme = createMuiTheme({
 	},
 });
 
+// Save to cache user data : username, email, id
 const App = ({ me, pathname, query }) => {
 	useStyles();
 	const client = useApolloClient();

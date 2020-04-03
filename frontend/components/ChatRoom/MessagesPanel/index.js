@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
+import Router from "next/router";
 import {
 	useMutation,
 	useQuery,
@@ -12,10 +13,8 @@ import MessageBanner from "./MessageBanner";
 import MessageForm from "./MessageForm";
 import { DualBallLoader } from "../../shared/loaders";
 import {
-	CHANNEL_QUERY,
-	CHANNEL_MESSAGES_QUERY,
-	ACTIVE_CHANNEL_QUERY,
-	LATEST_CHANNEL_MESSAGE_QUERY,
+	CHANNELS_QUERY,
+	CHANNELS_QUERY_FROM_CACHE,
 } from "../../../gqls/queries/channelQueries";
 import { MESSAGE_SUBSCRIPTION } from "../../../gqls/subscriptions/channelSubscriptions";
 
@@ -39,48 +38,46 @@ const scrollToBottom = (messagesEndRef) => {
 	messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 };
 
-const MessagesPanel = ({ classes, me, channel }) => {
+const MessagesPanel = ({ classes, me, query, loading, error, data }) => {
 	const client = useApolloClient();
 	const messagesEndRef = useRef();
+	const [channel, setChannel] = useState(null);
 
-	const { refetch } = useQuery(ACTIVE_CHANNEL_QUERY, {
+	const { refetch: channelsRefetch } = useQuery(CHANNELS_QUERY, {
+		variables: { userId: me.id },
 		onError: (e) => {
-			console.log("MessagesPanel: ACTIVE_CHANNEL_QUERY:", e);
+			console.log("MessagesPanel: CHANNELS_QUERY:", e);
 		},
 	});
-
-	const { refetch: channelsRefetch } = useQuery(CHANNEL_QUERY, {
-		onError: (e) => {
-			console.log("MessagesPanel: CHANNEL_QUERY:", e);
-		},
-	});
-
-	const { refetch: latestChannelMessageRefetch } = useQuery(
-		LATEST_CHANNEL_MESSAGE_QUERY,
-		{
-			variables: { channelId: channel.id },
-			onError: (e) => {
-				console.log("MessagesPanel: LATEST_CHANNEL_MESSAGE_QUERY: ", e);
-			},
-		}
-	);
 
 	useSubscription(MESSAGE_SUBSCRIPTION, {
 		variables: { userId: me.id },
 		onSubscriptionData: ({ subscriptionData }) => {
-			const { message } = subscriptionData.data;
+			if (channel) {
+				const { message } = subscriptionData.data;
 
-			const updatedActiveChannel = { ...channel };
-			updatedActiveChannel.messages.push(message);
+				if (
+					channel.id === message.channel.id &&
+					me.id !== message.sender.id
+				) {
+					const data = client.readQuery({
+						query: CHANNELS_QUERY_FROM_CACHE,
+					});
+					const channels = [...data.channels];
+					channels
+						.filter((c) => c.id === channel.id)[0]
+						.messages.push({ ...message });
 
-			client.writeData({
-				data: { activeChannel: updatedActiveChannel },
-			});
-			if (channel.id === message.channel.id) {
-				refetch();
-				latestChannelMessageRefetch();
-				scrollToBottom(messagesEndRef);
-			} else if (channelsRefetch) channelsRefetch();
+					client.writeQuery({
+						query: CHANNELS_QUERY_FROM_CACHE,
+						data: {
+							...data,
+							channels: [...channels],
+						},
+					});
+					scrollToBottom(messagesEndRef);
+				}
+			}
 		},
 		onError: (e) => {
 			console.log("MessagesPanel: MESSAGE_SUBSCRIPTION:", e);
@@ -88,20 +85,44 @@ const MessagesPanel = ({ classes, me, channel }) => {
 	});
 
 	useEffect(() => {
-		scrollToBottom(messagesEndRef);
-	}, []);
+		if (data && data.channels) {
+			if (query.channelId)
+				setChannel(
+					data.channels.filter(
+						(channel) => channel.id === query.channelId
+					)[0]
+				);
+			else setChannel(data.channels[0]);
+		}
+	}, [query, data]);
+
+	useEffect(() => {
+		if (channel) scrollToBottom(messagesEndRef);
+	}, [channel]);
 
 	const messgageItems = () => {
-		const { messages, users } = channel;
-		const user =
-			users.length === 0
-				? me
-				: users[0].username === me.username
-				? users[1]
-				: users[0];
-		return messages.map((msg) => (
-			<Message message={msg} me={me} key={msg.id} />
-		));
+		if (loading)
+			return (
+				<Grid item>
+					<DualBallLoader aria-label={"Loading channels"} />
+				</Grid>
+			);
+		if (data && data.channels) {
+			const channel = data.channels.filter(
+				(channel) => channel.id === query.channelId
+			)[0];
+			const { messages, users } = channel;
+			const user =
+				users.length === 0
+					? me
+					: users[0].username === me.username
+					? users[1]
+					: users[0];
+			return messages.map((msg, idx) => (
+				<Message message={msg} me={me} key={idx} />
+			));
+		}
+		if (error) return <Grid item>Error: loading messages</Grid>;
 	};
 
 	return (
@@ -117,14 +138,17 @@ const MessagesPanel = ({ classes, me, channel }) => {
 					<Grid item ref={messagesEndRef} />
 				</Grid>
 			</Paper>
-			<MessageForm channel={channel} />
+			<MessageForm me={me} channel={channel} />
 		</Paper>
 	);
 };
 
 MessagesPanel.propTypes = {
 	me: PropTypes.object.isRequired,
-	channel: PropTypes.object.isRequired,
+	query: PropTypes.object.isRequired,
+	data: PropTypes.object,
+	loading: PropTypes.bool,
+	error: PropTypes.bool,
 };
 
 export default withStyles(styles)(MessagesPanel);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQuery, useApolloClient } from "@apollo/react-hooks";
 import {
@@ -12,35 +12,24 @@ import Channel from "./Channel";
 import ChannelBanner from "./ChannelBanner";
 import SearchForm from "./SearchForm";
 import { DualBallLoader } from "../../shared/loaders";
-import { CHANNEL_QUERY } from "../../../gqls/queries/channelQueries";
 
 const styles = (theme) => ({
 	paper: {
 		position: "relative",
 		height: "100%",
-		maxHeight: "100%",
-		overflowY: "auto",
-		overflowX: "hidden",
+		maxHeight: `calc(100vh - ${theme.navHeight}px)`,
+		overflow: "hidden",
 		padding: theme.spacing(0, 2),
 	},
-	list: {
-		width: "100%",
-		backgroundColor: theme.palette.background.paper,
+	channelsPaper: {
+		height: `calc(100% - 2 * ${theme.navHeight}px)`,
+		maxHeight: `calc(100% - 2 * ${theme.navHeight}px)`,
+		overflowY: "auto",
+		overflowX: "hidden",
 	},
 });
 
-const ChannelPanel = ({ classes, me, channelId }) => {
-	const client = useApolloClient();
-
-	const { data, loading, error } = useQuery(CHANNEL_QUERY, {
-		onCompleted: (data) => {
-			client.writeData({ data: { channels: data.me.channels } });
-		},
-		onError: (e) => {
-			console.log("ChannelPanel: CHANNEL_QUERY", e);
-		},
-	});
-
+const ChannelPanel = ({ classes, me, query, loading, error, data }) => {
 	const channelItems = () => {
 		if (loading)
 			return (
@@ -48,32 +37,19 @@ const ChannelPanel = ({ classes, me, channelId }) => {
 					<DualBallLoader aria-label={"Loading channels"} />
 				</ListItem>
 			);
-		if (data && data.me && data.me.channels) {
-			const { channels } = data.me;
-
-			if (channels.length == 0)
-				return (
-					<Typography>You don't have anyone to chat with</Typography>
-				);
-
-			return channels.map((channel) => {
-				const { users } = channel;
-				const user =
-					users.length == 1
-						? me
-						: users[0].username == me.username
-						? users[1]
-						: users[0];
-				return (
-					<Channel
-						me={me}
-						user={user}
-						active={channel.id === channelId}
-						channel={channel}
-						key={channel.id}
-					/>
-				);
-			});
+		if (data && data.channels) {
+			return data.channels.map((channel, idx) => (
+				<Channel
+					me={me}
+					active={
+						query.channelId
+							? channel.id === query.channelId
+							: idx === 0
+					}
+					channel={channel}
+					key={channel.id}
+				/>
+			));
 		}
 		if (error) return <ListItem>Error: loading channels</ListItem>;
 	};
@@ -82,14 +58,22 @@ const ChannelPanel = ({ classes, me, channelId }) => {
 		<Paper classes={{ root: classes.paper }} square>
 			<ChannelBanner me={me} />
 			<SearchForm me={me} />
-			<List classes={{ root: classes.list }}>{channelItems()}</List>
+			<Paper
+				classes={{ root: classes.channelsPaper }}
+				square
+				elevation={0}
+			>
+				<List classes={{ root: classes.list }}>{channelItems()}</List>
+			</Paper>
 		</Paper>
 	);
 };
 
 ChannelPanel.propTypes = {
 	me: PropTypes.object.isRequired,
-	channelId: PropTypes.string.isRequired,
+	data: PropTypes.object,
+	loading: PropTypes.bool.isRequired,
+	error: PropTypes.bool.isRequired,
 };
 
 export default withStyles(styles)(ChannelPanel);

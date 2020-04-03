@@ -3,10 +3,13 @@ import gql from "graphql-tag";
 
 const NOTIFICATIONS_QUERY = gql`
 	{
-		notifications {
+		me {
 			id
-			type
-			content
+			notifications {
+				id
+				type
+				content
+			}
 		}
 	}
 `;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQuery, useSubscription } from "@apollo/react-hooks";
 import {
@@ -38,15 +38,12 @@ const MessageBanner = ({ classes, me, channel }) => {
 	useEffect(() => {
 		if (channel) {
 			const { users } = channel;
-			if (users.length == 1) setRecipient(me);
-			else
-				setRecipient(
-					users[0].username === me.username ? users[1] : users[0]
-				);
+			if (users.length == 0) setRecipient(me);
+			else setRecipient(users[0]);
 		}
 	}, [channel]);
 
-	return recipient ? (
+	return (
 		<Paper classes={{ root: classes.container }} square variant="outlined">
 			<Grid
 				container
@@ -64,14 +61,22 @@ const MessageBanner = ({ classes, me, channel }) => {
 						<Grid item>
 							<IconButton>
 								<Avatar
-									alt={processUsername(recipient.username)}
-									src={recipient.avatar}
+									alt={
+										recipient
+											? processUsername(
+													recipient.username
+											  )
+											: ""
+									}
+									src={recipient ? recipient.avatar : ""}
 								/>
 							</IconButton>
 						</Grid>
 						<Grid item>
 							<Typography>
-								{processUsername(recipient.username)}
+								{recipient
+									? processUsername(recipient.username)
+									: ""}
 							</Typography>
 						</Grid>
 					</Grid>
@@ -108,12 +113,12 @@ const MessageBanner = ({ classes, me, channel }) => {
 				</Grid>
 			</Grid>
 		</Paper>
-	) : null;
+	);
 };
 
 MessageBanner.propTypes = {
 	me: PropTypes.object.isRequired,
-	channel: PropTypes.object.isRequired,
+	channel: PropTypes.object,
 };
 
 export default withStyles(styles)(MessageBanner);

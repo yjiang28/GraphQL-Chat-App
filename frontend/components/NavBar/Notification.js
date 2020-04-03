@@ -6,22 +6,22 @@ import {
 	Button,
 	Grid,
 	Typography,
-	withStyles
+	withStyles,
 } from "@material-ui/core";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
-import { CHANNEL_QUERY } from "../../gqls/queries/channelQueries";
+import { CHANNELS_QUERY } from "../../gqls/queries/channelQueries";
 import { ACCEPT_FRIEND_REQUEST_MUTATION } from "../../gqls/mutations/notificationMutations";
 
-const styles = theme => ({
+const styles = (theme) => ({
 	buttons: {
-		marginLeft: theme.spacing(2)
+		marginLeft: theme.spacing(2),
 	},
 	buttonRoot: {
-		marginRight: theme.spacing(1)
+		marginRight: theme.spacing(1),
 	},
 	buttonOutlined: {
-		fontSize: 12
-	}
+		fontSize: 12,
+	},
 });
 
 const Notification = forwardRef(({ classes, notification }, ref) => {
@@ -32,11 +32,11 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 		{
 			refetchQueries: [
 				{ query: NOTIFICATIONS_QUERY },
-				{ query: CHANNEL_QUERY }
+				// { query: CHANNELS_QUERY, variables: {userId: } }
 			],
-			onError: e => {
+			onError: (e) => {
 				console.log("Notification: ACCEPT_FRIEND_REQUEST_MUTATION:", e);
-			}
+			},
 		}
 	);
 
@@ -58,7 +58,7 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 							color="inherit"
 							classes={{
 								root: classes.buttonRoot,
-								outlined: classes.buttonOutlined
+								outlined: classes.buttonOutlined,
 							}}
 						>
 							Ignore
@@ -68,7 +68,7 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 							variant="outlined"
 							color="inherit"
 							classes={{
-								outlined: classes.buttonOutlined
+								outlined: classes.buttonOutlined,
 							}}
 							onClick={acceptFriendRequest}
 						>
@@ -82,7 +82,7 @@ const Notification = forwardRef(({ classes, notification }, ref) => {
 });
 
 Notification.propTypes = {
-	notification: PropTypes.object.isRequired
+	notification: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Notification);

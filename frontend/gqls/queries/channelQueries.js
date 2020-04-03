@@ -1,19 +1,18 @@
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
-const CHANNEL_QUERY = gql`
-	{
+const CHANNELS_QUERY = gql`
+	query Channels($userId: ID!) {
 		me {
 			id
-			channels {
+			channels(orderBy: updatedAt_DESC, first: 20) {
 				id
-				users {
+				users(where: { id_not: $userId }) {
 					id
 					username
 					avatar
 				}
 				messages(orderBy: createdAt_ASC, last: 20) {
-					id
 					sender {
 						id
 						username
@@ -29,14 +28,48 @@ const CHANNEL_QUERY = gql`
 	}
 `;
 
-const LATEST_CHANNEL_MESSAGE_QUERY = gql`
-	query LatestChannelMessage($channelId: ID!) {
-		latestChannelMessage(channelId: $channelId) {
+const CHANNELS_QUERY_FROM_CACHE = gql`
+	{
+		channels @client {
 			id
-			content
+			users {
+				id
+				username
+				avatar
+			}
+			messages {
+				sender {
+					id
+					username
+				}
+				recipient {
+					id
+					username
+				}
+				content
+			}
 		}
 	}
 `;
+
+// const LATEST_CHANNEL_MESSAGE_QUERY = gql`
+// 	query LatestChannelMessage($channelId: ID!) {
+// 		latestChannelMessage(channelId: $channelId) {
+// 			id
+// 			content
+// 		}
+// 	}
+// `;
+
+// const LATEST_CHANNEL_MESSAGE_QUERY = gql`
+// 	fragment Channel on Channels {
+// 		id
+// 		messages(last: 1) {
+// 			id
+// 			content
+// 		}
+// 	}
+// `;
 
 const ACTIVE_CHANNEL_QUERY = gql`
 	{
@@ -107,8 +140,9 @@ const LATEST_ACTIVE_CHANNEL_QUERY = gql`
 `;
 
 export {
-	CHANNEL_QUERY,
-	LATEST_CHANNEL_MESSAGE_QUERY,
+	CHANNELS_QUERY,
+	CHANNELS_QUERY_FROM_CACHE,
+	// LATEST_CHANNEL_MESSAGE_QUERY,
 	ACTIVE_CHANNEL_QUERY,
 	CHANNEL_MESSAGES_QUERY,
 	LATEST_ACTIVE_CHANNEL_QUERY,

@@ -14,12 +14,12 @@ function createClient({ headers }) {
 	const cache = new InMemoryCache();
 
 	// Helper function to get data from the cache
-	const getState = query => {
+	const getState = (query) => {
 		return cache.readQuery({ query }).state;
 	};
 
 	// Helper function to write data back to the cache
-	const writeState = state => {
+	const writeState = (state) => {
 		return cache.writeData({ data: { state } });
 	};
 
@@ -28,31 +28,31 @@ function createClient({ headers }) {
 		const state = {
 			appState: {
 				me: {},
-				game: {}
+				game: {},
 			},
-			__typename: "State"
+			__typename: "State",
 		};
 
 		writeState(state);
 	};
 
-	const request = operation => {
+	const request = (operation) => {
 		operation.setContext({
-			headers
+			headers,
 		});
 	};
 
 	const requestLink = new ApolloLink(
 		(operation, forward) =>
-			new Observable(observer => {
+			new Observable((observer) => {
 				let handle;
 				Promise.resolve(operation)
-					.then(oper => {
+					.then((oper) => {
 						request(oper);
 						handle = forward(operation).subscribe({
 							next: observer.next.bind(observer),
 							error: observer.error.bind(observer),
-							complete: observer.complete.bind(observer)
+							complete: observer.complete.bind(observer),
 						});
 					})
 					.catch(observer.error.bind(observer));
@@ -65,14 +65,14 @@ function createClient({ headers }) {
 
 	const httpLink = new HttpLink({
 		uri: endpoint,
-		credentials: "include"
+		credentials: "include",
 	});
 
 	// Create a WebSocket link
 	const wsLink = process.browser
 		? new WebSocketLink(
 				new SubscriptionClient(subscriptionEndpoint, {
-					reconnect: true
+					reconnect: true,
 				})
 		  )
 		: null;
@@ -98,7 +98,7 @@ function createClient({ headers }) {
 		link: ApolloLink.from([requestLink, link]),
 		cache,
 		resolvers: {},
-		ssrMode: typeof window === "undefined" // Disables forceFetch on the server (so queries are only run once)
+		ssrMode: typeof window === "undefined", // Disables forceFetch on the server (so queries are only run once)
 	});
 }
 

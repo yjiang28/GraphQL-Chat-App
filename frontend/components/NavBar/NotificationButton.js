@@ -5,7 +5,7 @@ import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import Notification from "./Notification";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
-import { CHANNEL_QUERY } from "../../gqls/queries/channelQueries";
+import { CHANNELS_QUERY } from "../../gqls/queries/channelQueries";
 import { NOTIFICATION_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
 // import { DualBallLoader } from "../shared/loaders";
 
@@ -13,20 +13,27 @@ const NotificationButton = ({ me }) => {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [newNotif, setNewNotif] = useState(false);
 
-	const { data, loading, refetch } = useQuery(NOTIFICATIONS_QUERY, {
-		onError: e => {
+	const { data, loading, error, refetch } = useQuery(NOTIFICATIONS_QUERY, {
+		onCompleted: (data) => {
+			if (
+				data &&
+				data.me &&
+				data.me.notifications &&
+				data.me.notifications.length > 0
+			)
+				setNewNotif(true);
+		},
+		onError: (e) => {
 			console.log("NotificationButton: NOTIFICATIONS_QUERY:", e);
-		}
+		},
 	});
 
-	const { refetch: refetchChannels, error: channelsQueryError } = useQuery(
-		CHANNEL_QUERY,
-		{
-			onError: e => {
-				console.log("NotificationButton: CHANNEL_QUERY:", e);
-			}
-		}
-	);
+	const { refetch: refetchChannels } = useQuery(CHANNELS_QUERY, {
+		variables: { userId: me.id },
+		onError: (e) => {
+			console.log("NotificationButton: CHANNELS_QUERY:", e);
+		},
+	});
 
 	useSubscription(NOTIFICATION_SUBSCRIPTION, {
 		variables: { userId: me.id },
@@ -39,12 +46,12 @@ const NotificationButton = ({ me }) => {
 			)
 				refetchChannels();
 		},
-		onError: e => {
+		onError: (e) => {
 			console.log("NotificationButton: NOTIFICATION_SUBSCRIPTION:", e);
-		}
+		},
 	});
 
-	const openMenu = e => {
+	const openMenu = (e) => {
 		setNewNotif(false);
 		setAnchorEl(e.currentTarget);
 	};
@@ -53,26 +60,21 @@ const NotificationButton = ({ me }) => {
 		setAnchorEl(null);
 	};
 
-	useEffect(() => {
-		if (data && data.notifications && data.notifications.length > 0)
-			setNewNotif(true);
-	}, [data]);
-
 	const notifications = () => {
 		if (loading) return <MenuItem>Loading... </MenuItem>;
-		if (data && data.notifications) {
-			const { notifications } = data;
+		if (data && data.me && data.me.notifications) {
+			const { notifications } = data.me;
 			if (notifications.length === 0)
 				return <MenuItem>No unread notifications</MenuItem>;
 			else
-				return notifications.map(notification => (
+				return notifications.map((notification) => (
 					<Notification
 						notification={notification}
 						key={notification.id}
 					/>
 				));
 		}
-		return <MenuItem>No unread notifications</MenuItem>;
+		if (error) return <MenuItem>Error: fetching notifications</MenuItem>;
 	};
 
 	return (
@@ -96,11 +98,11 @@ const NotificationButton = ({ me }) => {
 				getContentAnchorEl={null}
 				anchorOrigin={{
 					vertical: "bottom",
-					horizontal: "right"
+					horizontal: "right",
 				}}
 				transformOrigin={{
 					vertical: "top",
-					horizontal: "right"
+					horizontal: "right",
 				}}
 				keepMounted
 				open={Boolean(anchorEl)}
@@ -113,7 +115,7 @@ const NotificationButton = ({ me }) => {
 };
 
 NotificationButton.propTypes = {
-	me: PropTypes.object.isRequired
+	me: PropTypes.object.isRequired,
 };
 
 export default NotificationButton;

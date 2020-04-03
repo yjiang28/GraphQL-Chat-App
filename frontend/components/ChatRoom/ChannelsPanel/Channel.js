@@ -16,10 +16,7 @@ import {
 } from "@material-ui/core";
 
 import { processUsername } from "../../../scripts/utils";
-import {
-	LATEST_CHANNEL_MESSAGE_QUERY,
-	ACTIVE_CHANNEL_QUERY,
-} from "../../../gqls/queries/channelQueries";
+import { ACTIVE_CHANNEL_QUERY } from "../../../gqls/queries/channelQueries";
 
 const styles = (theme) => ({
 	listItem: {
@@ -34,32 +31,17 @@ const styles = (theme) => ({
 	},
 });
 
-const Channel = ({ classes, me, user, channel, active }) => {
+const Channel = ({ classes, me, channel, active }) => {
 	const client = useApolloClient();
-
+	const { id, messages, users } = channel;
+	const user = users.length === 0 ? me : users[0];
 	const { username } = user;
-	const { id: channelId } = channel;
-
-	const { data, loading } = useQuery(LATEST_CHANNEL_MESSAGE_QUERY, {
-		variables: { channelId },
-		onError: (e) => {
-			console.log("Channel: LATEST_CHANNEL_MESSAGE_QUERY: ", e);
-		},
-	});
-
-	const { refetch } = useQuery(ACTIVE_CHANNEL_QUERY, {
-		onError: (e) => {
-			console.log("MessagesPanel: ACTIVE_CHANNEL_QUERY:", e);
-		},
-	});
 
 	const handleClick = () => {
 		Router.push({
 			pathname: "/chatroom",
-			query: { channelId },
+			query: { channelId: id },
 		});
-		client.writeData({ data: { activeChannel: channel } });
-		if (refetch) refetch();
 	};
 
 	return (
@@ -87,7 +69,7 @@ const Channel = ({ classes, me, user, channel, active }) => {
 							? "Just You"
 							: processUsername(username)
 					}
-					secondary={data ? data.latestChannelMessage.content : ""}
+					secondary={messages[messages.length - 1].content}
 					classes={{ root: classes.username }}
 				/>
 			</ListItem>
@@ -97,7 +79,6 @@ const Channel = ({ classes, me, user, channel, active }) => {
 
 Channel.propTypes = {
 	me: PropTypes.object.isRequired,
-	user: PropTypes.object.isRequired,
 	channel: PropTypes.object.isRequired,
 	active: PropTypes.bool.isRequired,
 };

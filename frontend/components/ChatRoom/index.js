@@ -18,9 +18,8 @@ import {
 import ChannelsPanel from "./ChannelsPanel";
 import MessagesPanel from "./MessagesPanel";
 import {
-	CHANNEL_MESSAGES_QUERY,
-	LATEST_ACTIVE_CHANNEL_QUERY,
-	ACTIVE_CHANNEL_QUERY,
+	CHANNELS_QUERY,
+	CHANNELS_QUERY_FROM_CACHE,
 } from "../../gqls/queries/channelQueries";
 
 const styles = (theme) => ({
@@ -30,42 +29,66 @@ const styles = (theme) => ({
 	},
 });
 
+// Save to cache the 20 latest updated channels of user: {id users messages}
+// Save to cache the active channel: {id users messages}
 const ChatRoom = ({ classes, query, me }) => {
 	const client = useApolloClient();
-	const [messages, setMessages] = useState([]);
 
-	useQuery(LATEST_ACTIVE_CHANNEL_QUERY, {
+	const {
+		data,
+		refetch,
+		loading: loadingFromCache,
+		error: cacheError,
+	} = useQuery(CHANNELS_QUERY_FROM_CACHE, {
+		variables: { userId: me.id },
 		onCompleted: (data) => {
-			if (data && data.latestActiveChannel) {
-				client.writeData({
-					data: { activeChannel: data.latestActiveChannel },
-				});
+			if (data && data.channels && !query.channelId) {
 				Router.push({
 					pathname: "/chatroom",
 					query: {
-						channelId: data.latestActiveChannel.id,
+						channelId: data.channels[0].id,
 					},
 				});
 			}
 		},
 		onError: (e) => {
-			console.log("ChatRoom: LATEST_ACTIVE_CHANNEL_QUERY:", e);
+			console.log("ChannelPanel: CHANNELS_QUERY_FROM_CACHE", e);
 		},
 	});
 
-	const { data } = useQuery(ACTIVE_CHANNEL_QUERY, {
-		onError: (e) => {
-			console.log("ChatRoom: ACTIVE_CHANNEL_QUERY:", e);
-		},
-	});
+	const { loading: loadingFromServer, error: serverError } = useQuery(
+		CHANNELS_QUERY,
+		{
+			variables: { userId: me.id },
+			onCompleted: (data) => {
+				client.writeData({ data: { channels: data.me.channels } });
+				refetch();
+			},
+			onError: (e) => {
+				console.log("ChannelPanel: CHANNELS_QUERY", e);
+			},
+		}
+	);
 
-	return data && data.activeChannel ? (
+	return query.channelId ? (
 		<Grid container spacing={0} classes={{ root: classes.container }}>
 			<Grid item sm={4} md={3}>
-				<ChannelsPanel me={me} channelId={data.activeChannel.id} />
+				<ChannelsPanel
+					me={me}
+					query={query}
+					loading={loadingFromServer || loadingFromCache === true}
+					error={cacheError || serverError === true}
+					data={data}
+				/>
 			</Grid>
 			<Grid item sm={8} md={9}>
-				<MessagesPanel me={me} channel={data.activeChannel} />
+				<MessagesPanel
+					me={me}
+					query={query}
+					loading={loadingFromServer || loadingFromCache === true}
+					error={cacheError || serverError === true}
+					data={data}
+				/>
 			</Grid>
 		</Grid>
 	) : null;
