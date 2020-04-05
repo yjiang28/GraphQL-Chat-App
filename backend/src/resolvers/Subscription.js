@@ -9,11 +9,18 @@ const notificationTypes = {
 const messageType = "newMessage";
 
 const Subscription = {
-	notification: {
+	// notification: {
+	// 	subscribe: withFilter(
+	// 		() => pubsub.asyncIterator([friendRequest, friendRequestAccepted]),
+	// 		(payload, variables) =>
+	// 			payload.notification.recipient.id == variables.userId
+	// 	),
+	// },
+	friendRequest: {
 		subscribe: withFilter(
-			() => pubsub.asyncIterator([friendRequest, friendRequestAccepted]),
+			() => pubsub.asyncIterator([friendRequest]),
 			(payload, variables) =>
-				payload.notification.recipient.id == variables.userId
+				payload.friendRequest.recipient.id == variables.userId
 		),
 	},
 	message: {

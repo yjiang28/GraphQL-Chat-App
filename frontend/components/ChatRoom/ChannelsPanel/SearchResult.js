@@ -10,18 +10,18 @@ import {
 	IconButton,
 	Typography,
 	Snackbar,
-	withStyles
+	withStyles,
 } from "@material-ui/core";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import { SEND_FRIEND_REQUEST_MUTATION } from "../../../gqls/mutations/notificationMutations";
 import { NOTIFICATIONS_QUERY } from "../../../gqls/queries/notificationQueries";
 import { processUsername } from "../../../scripts/utils";
 
-const styles = theme => ({
+const styles = (theme) => ({
 	small: {
 		width: theme.spacing(4),
-		height: theme.spacing(4)
-	}
+		height: theme.spacing(4),
+	},
 });
 
 const SearchResult = forwardRef(({ classes, user, me }, ref) => {
@@ -29,9 +29,9 @@ const SearchResult = forwardRef(({ classes, user, me }, ref) => {
 
 	const [SendFriendRequest, _] = useMutation(SEND_FRIEND_REQUEST_MUTATION, {
 		refetchQueries: [{ query: NOTIFICATIONS_QUERY }],
-		onError: e => {
+		onError: (e) => {
 			console.log("SearchResult: SEND_FRIEND_REQUEST_MUTATION", e);
-		}
+		},
 	});
 
 	const sendFriendRequest = () => {
@@ -71,7 +71,7 @@ const SearchResult = forwardRef(({ classes, user, me }, ref) => {
 				)}
 			</ListItem>
 			<Snackbar
-				anchorOrigin={{ vertical: "center", horizontal: "center" }}
+				anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 				open={snackbar}
 				onClose={handleClose}
 				message={`Your friend request has been sent to ${displayedUsername}`}
@@ -82,7 +82,7 @@ const SearchResult = forwardRef(({ classes, user, me }, ref) => {
 
 SearchResult.propTypes = {
 	me: PropTypes.object.isRequired,
-	user: PropTypes.object.isRequired
+	user: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(SearchResult);

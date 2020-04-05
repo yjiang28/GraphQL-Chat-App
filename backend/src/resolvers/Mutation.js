@@ -135,14 +135,16 @@ const Mutation = {
 						connect: { username: recipientUsername.toLowerCase() },
 					},
 					type: friendRequest,
-					content: `User ${senderUsername} sent you a friend request!`,
+					content: `User ${processUsername(
+						senderUsername
+					)} sent you a friend request!`,
 				},
 			},
 			info
 		);
 
 		pubsub.publish(friendRequest, {
-			notification,
+			friendRequest: notification,
 		});
 
 		return notification;

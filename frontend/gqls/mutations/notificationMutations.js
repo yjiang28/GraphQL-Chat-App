@@ -4,6 +4,7 @@ const SEND_FRIEND_REQUEST_MUTATION = gql`
 	mutation SendFriendRequest($username: String!) {
 		sendFriendRequest(username: $username) {
 			id
+			type
 			content
 			recipient {
 				id

@@ -23,6 +23,7 @@ type Query {
 }
 
 type Subscription {
-	notification(userId: ID!): Notification!
+	friendRequest(userId: ID!): Notification!
+	# notification(userId: ID!): Notification!
 	message(userId: ID!): Message!
 }

@@ -6,8 +6,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import Notification from "./Notification";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
 import { CHANNELS_QUERY } from "../../gqls/queries/channelQueries";
-import { NOTIFICATION_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
-// import { DualBallLoader } from "../shared/loaders";
+import { FRIEND_REQUEST_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
 
 const NotificationButton = ({ me }) => {
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -20,12 +19,14 @@ const NotificationButton = ({ me }) => {
 				data.me &&
 				data.me.notifications &&
 				data.me.notifications.length > 0
-			)
+			) {
 				setNewNotif(true);
+			}
 		},
 		onError: (e) => {
 			console.log("NotificationButton: NOTIFICATIONS_QUERY:", e);
 		},
+		notifyOnNetworkStatusChange: true,
 	});
 
 	const { refetch: refetchChannels } = useQuery(CHANNELS_QUERY, {
@@ -35,19 +36,14 @@ const NotificationButton = ({ me }) => {
 		},
 	});
 
-	useSubscription(NOTIFICATION_SUBSCRIPTION, {
+	useSubscription(FRIEND_REQUEST_SUBSCRIPTION, {
 		variables: { userId: me.id },
 		onSubscriptionData: ({ subscriptionData }) => {
+			const { friendRequest } = subscriptionData.data;
 			if (refetch) refetch();
-			if (
-				subscriptionData.data.notification.type ===
-					"FriendRequestAccepted" &&
-				refetchChannels
-			)
-				refetchChannels();
 		},
 		onError: (e) => {
-			console.log("NotificationButton: NOTIFICATION_SUBSCRIPTION:", e);
+			console.log("NotificationButton: FRIEND_REQUEST_SUBSCRIPTION:", e);
 		},
 	});
 

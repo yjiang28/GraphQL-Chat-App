@@ -5,7 +5,7 @@ const NOTIFICATIONS_QUERY = gql`
 	{
 		me {
 			id
-			notifications {
+			notifications(orderBy: createdAt_DESC, first: 10) {
 				id
 				type
 				content
