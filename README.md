@@ -12,4 +12,5 @@ Features:
 -   Real-time messaging
 
 Optimisitc UI chat:  
-![Demo](https://media.giphy.com/media/TfFXwbZaZ4OzzYn36o/giphy.gif)
+![Demo](https://media.giphy.com/media/TfFXwbZaZ4OzzYn36o/giphy.gif)  
+View a clearer video version [here](https://youtu.be/2RTRxQm4CJY) 
