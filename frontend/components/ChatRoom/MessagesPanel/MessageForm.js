@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import PropTypes from "prop-types";
 import {
@@ -45,6 +45,9 @@ const styles = (theme) => ({
 
 const MessageForm = ({ classes, me, channel }) => {
   const [recipient, setRecipient] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const formRef = useRef();
 
   useEffect(() => {
     if (channel) {
@@ -59,14 +62,24 @@ const MessageForm = ({ classes, me, channel }) => {
     },
   });
 
+  const handleChange = (e) => {
+    setMessage(e.currentTarget.value);
+  };
+
+  const handleKeyPress = async (e) => {
+    if (e.keyCode === 13 && e.shiftKey === false) {
+      e.preventDefault();
+      sendMessage(e);
+    }
+  };
+
   const sendMessage = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const message = formData.get("message");
-    e.target.reset();
+    const currentMessage = message;
+    setMessage("");
 
     SendMessage({
-      variables: { channelId: channel.id, message },
+      variables: { channelId: channel.id, message: currentMessage },
       optimisticResponse: {
         __typename: "Mutation",
         sendMessage: {
@@ -74,7 +87,7 @@ const MessageForm = ({ classes, me, channel }) => {
           channel: { ...channel },
           sender: { ...me },
           recipient: { ...recipient },
-          content: message,
+          content: currentMessage,
         },
       },
       update: (proxy, { data: { sendMessage } }) => {
@@ -101,7 +114,7 @@ const MessageForm = ({ classes, me, channel }) => {
       color="default"
       classes={{ root: classes.appBar }}
     >
-      <form onSubmit={sendMessage}>
+      <form onSubmit={sendMessage} ref={formRef}>
         <Toolbar classes={{ root: classes.toolBar }}>
           <IconButton edge="start" color="primary">
             <KeyboardIcon />
@@ -113,10 +126,15 @@ const MessageForm = ({ classes, me, channel }) => {
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
+              value={message}
+              onChange={handleChange}
               name="message"
               inputProps={{ "aria-label": "message" }}
               fullWidth
               multiline
+              inputProps={{
+                onKeyDown: handleKeyPress,
+              }}
             />
           </div>
           <IconButton

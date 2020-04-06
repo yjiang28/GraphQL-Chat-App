@@ -11,4 +11,4 @@ Features:
 -   Pubsub notification
 -   Real-time messaging
 
-![Demo](https://media.giphy.com/media/kIKv9nwGpY6cepCcXB/giphy.gif)
+![Demo](https://giphy.com/gifs/TfFXwbZaZ4OzzYn36o/html5)

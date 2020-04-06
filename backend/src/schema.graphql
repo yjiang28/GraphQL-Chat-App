@@ -10,6 +10,7 @@ type Mutation {
 	sendFriendRequest(username: String!): Notification!
 	acceptFriendRequest(id: ID!): Channel!
 	sendMessage(channelId: ID!, message: String!): Message!
+	deleteChannel(where: ChannelWhereUniqueInput!): Channel
 }
 
 type Query {
@@ -24,6 +25,6 @@ type Query {
 
 type Subscription {
 	friendRequest(userId: ID!): Notification!
-	# notification(userId: ID!): Notification!
+	channel(userId: ID!): Channel!
 	message(userId: ID!): Message!
 }

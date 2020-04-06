@@ -24,6 +24,7 @@ const processUsername = (username) => {
 };
 
 const Mutation = {
+	deleteChannel: forwardTo("db"),
 	async signUp(parent, args, ctx, info) {
 		const username = args.username.toLowerCase();
 		const email = args.email.toLowerCase();
@@ -162,52 +163,8 @@ const Mutation = {
 			"{sender{ id username } recipient{ id username}}"
 		);
 
-		const notificationToRecipient = await ctx.db.mutation.createNotification(
-			{
-				data: {
-					sender: {
-						connect: { id: sender.id },
-					},
-					recipient: {
-						connect: { id: recipient.id },
-					},
-					type: friendRequestAccepted,
-					content: `You became friends with ${processUsername(
-						sender.username
-					)}.`,
-				},
-			},
-			"{id type content sender{id username} recipient{id username}}"
-		);
-
-		const notificationToSender = await ctx.db.mutation.createNotification(
-			{
-				data: {
-					sender: {
-						connect: { id: recipient.id },
-					},
-					recipient: {
-						connect: { id: sender.id },
-					},
-					type: friendRequestAccepted,
-					content: `You became friends with ${processUsername(
-						recipient.username
-					)}.`,
-				},
-			},
-			"{id type content sender{id username} recipient{id username}}"
-		);
-
 		await ctx.db.mutation.deleteNotification({
 			where: { id },
-		});
-
-		pubsub.publish(friendRequestAccepted, {
-			notification: notificationToRecipient,
-		});
-
-		pubsub.publish(friendRequestAccepted, {
-			notification: notificationToSender,
 		});
 
 		const channel = await ctx.db.mutation.createChannel(
@@ -230,6 +187,10 @@ const Mutation = {
 			},
 			info
 		);
+
+		pubsub.publish(friendRequestAccepted, {
+			channel,
+		});
 
 		return channel;
 	},

@@ -1,14 +1,27 @@
 import { Fragment, useState, useEffect } from "react";
-import { useMutation, useSubscription, useQuery } from "@apollo/react-hooks";
+import {
+	useMutation,
+	useSubscription,
+	useQuery,
+	useApolloClient,
+} from "@apollo/react-hooks";
+import Router from "next/router";
 import PropTypes from "prop-types";
 import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import Notification from "./Notification";
 import { NOTIFICATIONS_QUERY } from "../../gqls/queries/notificationQueries";
-import { CHANNELS_QUERY } from "../../gqls/queries/channelQueries";
-import { FRIEND_REQUEST_SUBSCRIPTION } from "../../gqls/subscriptions/notificationSubscription";
+import {
+	CHANNELS_QUERY,
+	CHANNELS_QUERY_FROM_CACHE,
+} from "../../gqls/queries/channelQueries";
+import {
+	FRIEND_REQUEST_SUBSCRIPTION,
+	CHANNEL_SUBSCRIPTION,
+} from "../../gqls/subscriptions/notificationSubscription";
 
 const NotificationButton = ({ me }) => {
+	const client = useApolloClient();
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [newNotif, setNewNotif] = useState(false);
 
@@ -39,11 +52,46 @@ const NotificationButton = ({ me }) => {
 	useSubscription(FRIEND_REQUEST_SUBSCRIPTION, {
 		variables: { userId: me.id },
 		onSubscriptionData: ({ subscriptionData }) => {
-			const { friendRequest } = subscriptionData.data;
 			if (refetch) refetch();
 		},
 		onError: (e) => {
 			console.log("NotificationButton: FRIEND_REQUEST_SUBSCRIPTION:", e);
+		},
+	});
+
+	useSubscription(CHANNEL_SUBSCRIPTION, {
+		variables: { userId: me.id },
+		onSubscriptionData: ({ subscriptionData }) => {
+			const { channel } = subscriptionData.data;
+			const data = client.readQuery({
+				query: CHANNELS_QUERY_FROM_CACHE,
+			});
+			const channels = [...data.channels];
+
+			channels.unshift({
+				...channel,
+				users: [...channel.users.filter((user) => user.id !== me.id)],
+			});
+
+			console.log(channels);
+
+			client.writeQuery({
+				query: CHANNELS_QUERY_FROM_CACHE,
+				data: {
+					...data,
+					channels,
+				},
+			});
+
+			Router.push({
+				pathname: "/chatroom",
+				query: {
+					channelId: channel.id,
+				},
+			});
+		},
+		onError: (e) => {
+			console.log("NotificationButton: CHANNEL_SUBSCRIPTION:", e);
 		},
 	});
 

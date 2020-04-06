@@ -22,6 +22,18 @@ const ACCEPT_FRIEND_REQUEST_MUTATION = gql`
 			users {
 				id
 				username
+				avatar
+			}
+			messages(orderBy: createdAt_ASC, last: 20) {
+				sender {
+					id
+					username
+				}
+				recipient {
+					id
+					username
+				}
+				content
 			}
 		}
 	}

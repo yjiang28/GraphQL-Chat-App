@@ -86,13 +86,14 @@ const MessagesPanel = ({ classes, me, query, loading, error, data }) => {
 
 	useEffect(() => {
 		if (data && data.channels) {
-			if (query.channelId)
+			if (query.channelId) {
 				setChannel(
 					data.channels.filter(
 						(channel) => channel.id === query.channelId
 					)[0]
 				);
-			else setChannel(data.channels[0]);
+				console.log(query.channelId);
+			} else setChannel(data.channels[0]);
 		}
 	}, [query, data]);
 

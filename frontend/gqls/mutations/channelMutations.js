@@ -19,4 +19,12 @@ const SEND_MESSAGE_MUTATION = gql`
 	}
 `;
 
-export { SEND_MESSAGE_MUTATION };
+const DELETE_CHANNEL_MUTATION = gql`
+	mutation DeleteChannel($channelId: ID!) {
+		deleteChannel(where: { id: $channelId }) {
+			id
+		}
+	}
+`;
+
+export { SEND_MESSAGE_MUTATION, DELETE_CHANNEL_MUTATION };
