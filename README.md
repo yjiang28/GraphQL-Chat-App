@@ -11,4 +11,5 @@ Features:
 -   Pubsub notification
 -   Real-time messaging
 
-![Demo](https://giphy.com/gifs/TfFXwbZaZ4OzzYn36o/html5)
+Optimisitc UI chat:  
+![Demo](https://media.giphy.com/media/TfFXwbZaZ4OzzYn36o/giphy.gif)
