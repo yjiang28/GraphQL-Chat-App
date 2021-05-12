@@ -5053,10 +5053,10 @@ node-request-by-swagger@^1.0.6:
   resolved "https://registry.npm.taobao.org/node-request-by-swagger/download/node-request-by-swagger-1.1.4.tgz#909a057bd4dffdf5245cb713f5543a9c56eea94d"
   integrity sha1-kJoFe9Tf/fUkXLcT9VQ6nFbuqU0=
 
-nodemailer@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.npm.taobao.org/nodemailer/download/nodemailer-4.7.0.tgz#4420e06abfffd77d0618f184ea49047db84f4ad8"
-  integrity sha1-RCDgar//130GGPGE6kkEfbhPStg=
+nodemailer@^6.4.16:
+  version "6.4.16"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.4.16.tgz#5cb6391b1d79ab7eff32d6f9f48366b5a7117293"
+  integrity sha512-68K0LgZ6hmZ7PVmwL78gzNdjpj5viqBdFqKrTtr9bZbJYj6BRj5W6WGkxXrEnUl3Co3CBXi3CZBUlpV/foGnOQ==
 
 nodemon@^1.19.1:
   version "1.19.4"
